@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>קופה בסופר — נחש את המחיר (תיקון שגיאה בעברית + סינון קטגוריות + בדיקות)</title>
+<style>
+  body{font-family:'Rubik',Arial,sans-serif;background:#fdfdfd;margin:0;color:#111}
+  header{background:#f0f0f0;padding:10px 12px;border-bottom:2px solid #ddd;position:sticky;top:0;z-index:5}
+  .title{font-weight:900;font-size:20px}
+  .tabs{margin-top:6px;display:flex;gap:8px;flex-wrap:wrap}
+  .tab-btn{padding:6px 12px;border-radius:8px;border:1px solid #aaa;background:#fff;cursor:pointer}
+  .tab-btn.active{background:#ffeb99}
+  main{padding:14px}
+  .card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:12px;margin-bottom:16px}
+  .row{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:900px){.row{grid-template-columns:1.2fr .8fr}}
+  .lcd{display:inline-block;background:#eaffea;border:2px solid #86efac;border-radius:10px;padding:6px 10px;font-weight:800}
+  table{width:100%;border-collapse:collapse}
+  th,td{border-bottom:1px dashed #ddd;padding:6px 8px;text-align:right}
+  th{background:#fff8cc}
+  .muted{color:#666}
+  .ok{color:#eab308}.good{color:#16a34a}.bad{color:#ef4444}
+  .test-badge{display:inline-block;padding:4px 8px;border-radius:999px;border:2px solid #ddd;margin-top:6px;font-weight:800}
+</style>
+</head>
+<body>
+  <header>
+    <div class="title">קופה בסופר — נחש את המחיר</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="game">🧾 קופה</button>
+      <button class="tab-btn" data-tab="budget">🧺 סל בתקציב</button>
+      <button class="tab-btn" data-tab="about">❓ איך משחקים</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- GAME -->
+    <section id="game" class="card">
+      <div class="row">
+        <div>
+          <div style="font-size:48px" id="p-emoji">🧃</div>
+          <div style="font-size:22px;font-weight:900" id="p-name">שם מוצר</div>
+          <div class="muted" id="p-meta">קטגוריה • קושי</div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+            <label>קטגוריה
+              <select id="categorySelect"></select>
+            </label>
+            <label>קושי
+              <select id="difficultySelect">
+                <option value="all">הכל</option>
+                <option value="1">קל</option>
+                <option value="2">בינוני</option>
+                <option value="3">קשה</option>
+              </select>
+            </label>
+            <button id="nextBtn">🔔 סריקה</button>
+          </div>
+
+          <div style="margin-top:10px">
+            <span class="lcd">₪ <span id="lcdVal">0</span></span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">
+            <input id="guessInput" type="number" min="0" placeholder="כמה עולה? (₪)">
+            <button id="checkBtn">✅ אישור סכום</button>
+            <button id="revealBtn">💡 גלה מחיר</button>
+          </div>
+          <div id="resultBox" style="margin-top:8px"></div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="muted">קבלה</div>
+            <table id="receiptTable">
+              <thead><tr><th>פריט</th><th>ניחוש</th><th>מחיר</th><th>סטייה</th></tr></thead>
+              <tbody></tbody>
+              <tfoot><tr><td><b>סה"כ נקודות</b></td><td colspan="3" id="recScore">0</td></tr></tfoot>
+            </table>
+          </div>
+          <div class="card">
+            <div class="muted">סטטיסטיקה</div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:6px">
+              <div><div class="muted">נקודות</div><div style="font-weight:900;font-size:20px" id="stat-score">0</div></div>
+              <div><div class="muted">ניסיונות</div><div style="font-weight:900;font-size:20px" id="stat-tries">0</div></div>
+              <div><div class="muted">בול (±5%)</div><div style="font-weight:900;font-size:20px" id="stat-perfect">0</div></div>
+              <div><div class="muted">סטייה ממוצעת</div><div style="font-weight:900;font-size:20px" id="stat-avgdev">—</div></div>
+            </div>
+            <div id="testsBadge" class="test-badge" style="display:none">בדיקות</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUDGET -->
+    <section id="budget" class="card" style="display:none">
+      <div style="font-size:20px;font-weight:900">🛒 סל קניות בתקציב</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+        <label>תקציב ₪<input type="number" id="budgetInput" value="300"></label>
+        <button id="resetBasket">♻️ אפס סל</button>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+        <label>קטגוריה<select id="basketCategory"></select></label>
+        <label>פריט<select id="basketItemSelect"></select></label>
+        <button id="addToBasket">➕ הוסף</button>
+      </div>
+      <table id="basketTable" style="margin-top:8px">
+        <thead><tr><th>פריט</th><th>קטגוריה</th><th>מחיר ייחוס</th><th>הסר</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div id="budgetResult" style="margin-top:8px"></div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="card" style="display:none">
+      <b>איך משחקים?</b>
+      <ul>
+        <li><b>ניקוד:</b> ±5% → 10 | ±15% → 8 | ±30% → 6 | ±50% → 4 | אחרת → 1. בונוס = דרגת קושי (1–3).</li>
+        <li><b>שיפור:</b> אם שיפרת שיא לאותו פריט → +1 נק׳.</li>
+        <li><b>טיפ:</b> אפשר לסנן לפי קטגוריה וקושי, ואז ללחוץ "סריקה".</li>
+      </ul>
+    </section>
+  </main>
+
+<script>
+'use strict';
+// =====================================================
+// 1) DATA — כל המפתחות באנגלית בלבד (מונע SyntaxError בעברית)
+// =====================================================
+const PRODUCTS=[
+  // Food
+  {category:"Food", name:"לחם פרוס", icon:"🍞", price:9, min:7, max:14, difficulty:1, note:"מאפים"},
+  {category:"Food", name:"שוקולד חלב 100ג׳", icon:"🍫", price:8, min:5, max:12, difficulty:1, note:"מותגים"},
+  {category:"Food", name:"חלב 3% 1ל׳", icon:"🥛", price:7, min:5, max:8, difficulty:1, note:"מקרר"},
+  {category:"Food", name:"פסטה 500ג׳", icon:"🍝", price:6, min:4, max:10, difficulty:1, note:"ספגטי/פנה"},
+  {category:"Food", name:"קורנפלקס 750ג׳", icon:"🥣", price:18, min:12, max:28, difficulty:2, note:"מותגים/בית"},
+  // Produce
+  {category:"Produce", name:"עגבניות 1ק", icon:"🍅", price:8, min:5, max:12, difficulty:2, note:"עונתי"},
+  {category:"Produce", name:"בננות 1ק", icon:"🍌", price:9, min:6, max:12, difficulty:2, note:"עונתי"},
+  // Hygiene/Cleaning
+  {category:"Hygiene", name:"שמפו 700מ״ל", icon:"🧴", price:16, min:12, max:28, difficulty:2, note:"משפחתי"},
+  {category:"Cleaning", name:"אבקת כביסה 3ק", icon:"🧼", price:38, min:28, max:65, difficulty:2, note:"מכונה"},
+  // Toys/School/Tech/Clothes
+  {category:"Toys", name:"סט לגו בינוני", icon:"🧱", price:240, min:150, max:450, difficulty:3, note:"פופולרי"},
+  {category:"School", name:"מחברת A4", icon:"📒", price:6, min:3, max:10, difficulty:1, note:"שורות/משבצות"},
+  {category:"Tech", name:"עכבר מחשב", icon:"🖱️", price:45, min:25, max:120, difficulty:1, note:"חוטי/אלחוטי"},
+  {category:"Tech", name:"מקלדת בסיסית", icon:"⌨️", price:79, min:49, max:160, difficulty:2, note:"ממברנה"},
+  {category:"Clothes", name:"טי-שירט ילדים", icon:"👕", price:39, min:25, max:80, difficulty:1, note:"רשתות"}
+];
+
+// =====================================================
+// 2) TABS
+// =====================================================
+const tabs=document.querySelectorAll('.tab-btn');
+const sections={game:document.getElementById('game'),budget:document.getElementById('budget'),about:document.getElementById('about')};
+tabs.forEach(btn=>btn.addEventListener('click',()=>{tabs.forEach(b=>b.classList.remove('active'));btn.classList.add('active');const t=btn.dataset.tab;Object.keys(sections).forEach(k=>sections[k].style.display=k===t?'block':'none');}));
+
+// =====================================================
+// 3) DOM REFS
+// =====================================================
+const catSel=document.getElementById('categorySelect');
+const diffSel=document.getElementById('difficultySelect');
+const elEmoji=document.getElementById('p-emoji');
+const elName=document.getElementById('p-name');
+const elMeta=document.getElementById('p-meta');
+const elResult=document.getElementById('resultBox');
+const lcdVal=document.getElementById('lcdVal');
+
+// Build category select
+const CATEGORIES=[...new Set(PRODUCTS.map(p=>p.category))].sort();
+catSel.innerHTML='<option value="all">כל הקטגוריות</option>'+CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('');
+
+// =====================================================
+// 4) GAME STATE + HELPERS
+// =====================================================
+let current=null, score=0, tries=0, perfects=0, devSum=0; const history=new Map();
+const statScore=document.getElementById('stat-score');
+const statTries=document.getElementById('stat-tries');
+const statPerfect=document.getElementById('stat-perfect');
+const statAvg=document.getElementById('stat-avgdev');
+const fmtN=n=>Number(n).toLocaleString('he-IL',{maximumFractionDigits:0});
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+function filteredProducts(){
+  let arr=PRODUCTS.slice();
+  if(catSel.value!=="all") arr=arr.filter(p=>p.category===catSel.value);
+  if(diffSel.value!=="all") arr=arr.filter(p=>String(p.difficulty)===diffSel.value);
+  return arr;
+}
+
+function nextProduct(){
+  const pool=filteredProducts();
+  if(!pool.length){
+    current=null; elEmoji.textContent='🛒'; elName.textContent='אין פריטים בקטגוריה/קושי שנבחרו'; elMeta.textContent='בחר/י אחרת'; elResult.textContent=''; return;
+  }
+  current=pick(pool);
+  elEmoji.textContent=current.icon||'🙂';
+  elName.textContent=current.name;
+  elMeta.textContent=`${current.category} • קושי ${current.difficulty}`;
+  elResult.textContent='';
+  document.getElementById('guessInput').value='';
+  lcdVal.textContent='0';
+}
+
+function basePoints(d){ if(d<=0.05) return 10; if(d<=0.15) return 8; if(d<=0.30) return 6; if(d<=0.50) return 4; return 1; }
+function starCount(base){ return ({10:5,8:4,6:3,4:2,1:1}[base]||1); }
+
+function checkGuess(){
+  if(!current){ elResult.textContent='אין פריט פעיל'; return; }
+  const input=document.getElementById('guessInput');
+  const guess=Number(input.value);
+  if(Number.isNaN(guess)||input.value===''){ elResult.textContent='הקלד/י ניחוש'; return; }
+  const diff=Math.abs(guess-current.price)/Math.max(1,current.price);
+  const base=basePoints(diff); const bonus=current.difficulty||0; let imp=0; const key=current.name;
+  if(!history.has(key)||diff<history.get(key)){ imp=history.has(key)?1:0; history.set(key,diff); }
+  const gained=base+bonus+imp; score+=gained; tries++; devSum+=diff; if(base===10) perfects++;
+  const cls=diff<=0.15?'good':(diff<=0.30?'ok':'bad');
+  elResult.innerHTML=`מחיר: <b>${fmtN(current.price)}</b> ₪ • ניחוש: <b>${fmtN(guess)}</b> ₪ • <span class="${cls}">סטייה ${(diff*100).toFixed(1)}%</span><br><span class="muted">טווח: ${current.min}–${current.max} ₪ • ${current.note||''}</span>`;
+  statScore.textContent=fmtN(score); statTries.textContent=tries; statPerfect.textContent=perfects; statAvg.textContent=tries?((devSum/tries*100).toFixed(1)+'%'):'—';
+  const tr=document.createElement('tr'); tr.innerHTML=`<td>${current.icon} ${current.name}</td><td>${fmtN(guess)}</td><td>${fmtN(current.price)}</td><td>${(diff*100).toFixed(1)}%</td>`; document.querySelector('#receiptTable tbody').prepend(tr);
+  document.getElementById('recScore').textContent=fmtN(score);
+}
+
+// keypad-lite: update LCD when typing
+(document.getElementById('guessInput')).addEventListener('input',e=>{ lcdVal.textContent=e.target.value||'0'; });
+
+// events
+catSel.addEventListener('change',nextProduct); // ← תיקון: שינוי קטגוריה מעדכן את הפריט
+
+diffSel.addEventListener('change',nextProduct);
+document.getElementById('nextBtn').addEventListener('click',nextProduct);
+document.getElementById('checkBtn').addEventListener('click',checkGuess);
+document.getElementById('revealBtn').addEventListener('click',()=>{ if(!current) return; elResult.innerHTML=`💡 המחיר הייחוסי: <b>${fmtN(current.price)}</b> ₪`; });
+
+// first load
+nextProduct();
+
+// =====================================================
+// 5) BUDGET (mini cart)
+// =====================================================
+const basket=[]; const basketBody=document.querySelector('#basketTable tbody');
+const budgetInput=document.getElementById('budgetInput'); const budgetResult=document.getElementById('budgetResult');
+const basketCat=document.getElementById('basketCategory'); const basketItemSel=document.getElementById('basketItemSelect');
+
+basketCat.innerHTML=CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('');
+function fillBasketItems(){ const c=basketCat.value; const items=PRODUCTS.filter(p=>p.category===c); basketItemSel.innerHTML=items.map((p,i)=>`<option value="${i}">${p.icon} ${p.name}</option>`).join(''); }
+basketCat.addEventListener('change', fillBasketItems); fillBasketItems();
+
+function renderBasket(){
+  basketBody.innerHTML=basket.map((it,idx)=>`<tr><td>${it.icon} ${it.name}</td><td>${it.category}</td><td>${fmtN(it.price)} ₪</td><td><button data-i="${idx}">🗑️</button></td></tr>`).join('');
+  basketBody.querySelectorAll('button').forEach(b=>b.onclick=()=>{ basket.splice(Number(b.dataset.i),1); renderBasket(); calcBudget(); });
+  calcBudget();
+}
+function calcBudget(){ const budget=Number(budgetInput.value||0); const sum=basket.reduce((s,it)=>s+it.price,0); const diff=sum-budget; budgetResult.innerHTML= diff<=0? `🥳 סה"כ: <b>${fmtN(sum)}</b> ₪ • נשאר: <b>${fmtN(-diff)}</b> ₪` : `🙈 חריגה: <b>${fmtN(diff)}</b> ₪ (סה"כ ${fmtN(sum)} ₪)`; }
+
+document.getElementById('addToBasket').addEventListener('click',()=>{ const c=basketCat.value; const idx=Number(basketItemSel.value); const list=PRODUCTS.filter(p=>p.category===c); const item=list[idx]; if(item){ basket.push(item); renderBasket(); }});
+document.getElementById('resetBasket').addEventListener('click',()=>{ basket.length=0; renderBasket(); });
+
+// =====================================================
+// 6) TESTS (ALWAYS add tests) — יופיעו בקונסולה + תגים על המסך
+// =====================================================
+(function runTests(){
+  const badge=document.getElementById('testsBadge');
+  const results=[]; const ok=(name,cond)=>{results.push({name,cond}); if(!cond) console.error('❌',name); else console.log('✅',name);};
+  try{
+    ok('Array PRODUCTS', Array.isArray(PRODUCTS));
+    ok('All product keys present', PRODUCTS.every(p=>'category' in p && 'name' in p && 'price' in p));
+    ok('Category select built', catSel.options.length>=CATEGORIES.length);
+    // Category filter test
+    catSel.value='Tech'; const poolTech=filteredProducts(); ok('Filter by Tech returns only Tech', poolTech.length>0 && poolTech.every(p=>p.category==='Tech'));
+    // Difficulty filter test
+    diffSel.value='3'; const poolDiff=filteredProducts(); ok('Filter by difficulty=3 works', poolDiff.every(p=>String(p.difficulty)==='3') || poolDiff.length===0);
+    // Empty pool resilience
+    const oldCat=catSel.value; catSel.value='__NONE__'; nextProduct(); ok('Empty pool handled', document.getElementById('p-name').textContent.includes('אין פריטים') ); catSel.value=oldCat; nextProduct();
+    // Guess scoring sanity
+    const ref=current.price; document.getElementById('guessInput').value=String(ref); checkGuess(); ok('Guess exact shows 0% diff', /0\.0%|0%/.test(document.getElementById('resultBox').textContent));
+    badge.style.display='inline-block'; badge.textContent = results.every(r=>r.cond)? 'בדיקות: PASS' : 'בדיקות: FAIL';
+  }catch(e){ console.error('Test crash', e); if(badge){badge.style.display='inline-block'; badge.textContent='בדיקות: ERROR';}
+  } finally { diffSel.value='all'; catSel.value='all'; nextProduct(); }
+})();
+</script>
+</body>
+</html>

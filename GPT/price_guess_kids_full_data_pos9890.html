@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>קופה בסופר — נחש את המחיר (קופה רושמת + קטגוריות + סל + בדיקות)</title>
+<style>
+  :root{--ink:#0f172a;--muted:#6b7280;--good:#22c55e;--warn:#f59e0b;--bad:#ef4444;--accent:#ffd166}
+  *{box-sizing:border-box}
+  body{font-family:'Rubik',system-ui,Arial;margin:0;background:linear-gradient(135deg,#fff8f0,#f0fff8);color:var(--ink)}
+  header{background:#222;color:#fff;padding:12px;position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center}
+  .title{font-weight:900}
+  .tabs{display:flex;gap:8px}
+  .tab-btn{padding:8px 12px;border-radius:10px;border:none;background:#3b3b3b;color:#fff;font-weight:800;cursor:pointer}
+  .tab-btn.active{background:var(--accent);color:#222}
+  main{padding:14px;max-width:1150px;margin:0 auto}
+  .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 6px 0 #eef2f7;padding:14px;margin-bottom:16px}
+  .row{display:grid;grid-template-columns:1.25fr .75fr;gap:12px}
+  @media(max-width:900px){.row{grid-template-columns:1fr}}
+  .face{display:flex;gap:14px;align-items:center}
+  .emoji{width:90px;height:90px;border-radius:12px;display:grid;place-items:center;font-size:56px;background:#fff;border:3px solid #eee}
+  .name{font-size:26px;font-weight:900}
+  .sub{color:var(--muted);font-size:13px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  select{padding:10px 12px;border:2px solid #e5e7eb;border-radius:10px;background:#fff;font-weight:700}
+  button.primary{padding:10px 14px;border-radius:10px;border:none;background:#22c55e;color:#fff;font-weight:900;cursor:pointer;box-shadow:0 3px 0 #16a34a}
+  button.secondary{padding:10px 14px;border-radius:10px;border:none;background:#eef2f7;font-weight:900;cursor:pointer}
+  .lcd{margin-top:10px;background:#111;color:#0ef3ac;font-family:'Courier New',monospace;border-radius:10px;padding:10px;text-align:center;font-size:22px;box-shadow:inset 0 0 12px #053}
+  .keypad{display:grid;grid-template-columns:repeat(3,110px);gap:10px;justify-content:center;margin-top:12px}
+  .keypad button{height:80px;border-radius:14px;border:none;background:#ffd166;font-weight:900;font-size:26px;cursor:pointer;box-shadow:0 5px 0 #e9b949}
+  .keypad button:active{transform:translateY(3px);box-shadow:0 2px 0 #e9b949}
+  .wide{grid-column:span 2}
+  .full{grid-column:span 3}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{border-bottom:1px dashed #e5e7eb;padding:8px 6px;text-align:right}
+  th{background:#fafafa}
+  .muted{color:var(--muted)}
+  .ok{color:#eab308}.good{color:#16a34a}.bad{color:#ef4444}
+  .test-badge{display:inline-block;padding:4px 8px;border-radius:999px;border:2px solid #ddd;margin-top:6px;font-weight:800}
+</style>
+</head>
+<body>
+  <header>
+    <div class="title">קופה בסופר — נחש את המחיר</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="game">🧾 קופה</button>
+      <button class="tab-btn" data-tab="budget">🧺 סל בתקציב</button>
+      <button class="tab-btn" data-tab="about">❓ איך משחקים</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- GAME -->
+    <section id="game" class="card">
+      <div class="row">
+        <div>
+          <div class="face">
+            <div class="emoji" id="p-emoji">🧃</div>
+            <div>
+              <div class="name" id="p-name">שם מוצר</div>
+              <div class="sub" id="p-meta">קטגוריה • קושי</div>
+            </div>
+          </div>
+
+          <div class="controls">
+            <label>קטגוריה
+              <select id="categorySelect"></select>
+            </label>
+            <label>קושי
+              <select id="difficultySelect">
+                <option value="all">הכל</option>
+                <option value="1">קל</option>
+                <option value="2">בינוני</option>
+                <option value="3">קשה</option>
+              </select>
+            </label>
+            <button class="secondary" id="nextBtn">🎲 פריט חדש</button>
+          </div>
+
+          <!-- LCD של הקופה + קלט נסתר שמסתנכרן -->
+          <input id="guessInput" type="number" min="0" style="position:absolute;left:-9999px;opacity:0" aria-hidden="true">
+          <div class="lcd" id="lcd">₪0</div>
+
+          <!-- לוח מספרים כמו קופה רושמת -->
+          <div class="keypad" aria-label="לוח מקשים">
+            <button data-key="1">1</button>
+            <button data-key="2">2</button>
+            <button data-key="3">3</button>
+            <button data-key="4">4</button>
+            <button data-key="5">5</button>
+            <button data-key="6">6</button>
+            <button data-key="7">7</button>
+            <button data-key="8">8</button>
+            <button data-key="9">9</button>
+            <button class="wide" data-key="00">00</button>
+            <button data-key="0">0</button>
+            <button data-act="back">←</button>
+            <button class="wide" data-act="clear">ניקוי</button>
+            <button class="full primary" id="enterBtn">ENTER ✅</button>
+          </div>
+
+          <div class="lcd muted" id="resultBox">מוכן</div>
+
+          <div class="controls">
+            <div class="muted">נקודות: <b id="stat-score">0</b> • ניסיונות: <b id="stat-tries">0</b> • בול (±5%): <b id="stat-perfect">0</b> • סטייה ממוצעת: <b id="stat-avgdev">—</b></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="muted">🧾 קבלה</div>
+            <table id="receiptTable">
+              <thead><tr><th>פריט</th><th>ניחוש</th><th>מחיר</th><th>סטייה</th></tr></thead>
+              <tbody></tbody>
+              <tfoot><tr><td><b>סה"כ נקודות</b></td><td colspan="3" id="recScore">0</td></tr></tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUDGET -->
+    <section id="budget" class="card" style="display:none">
+      <div style="font-size:20px;font-weight:900">🛒 סל קניות בתקציב</div>
+      <div class="controls">
+        <label>תקציב ₪<input type="number" id="budgetInput" value="300"></label>
+        <button id="resetBasket" class="secondary">♻️ אפס סל</button>
+      </div>
+      <div class="controls">
+        <label>קטגוריה<select id="basketCategory"></select></label>
+        <label>פריט<select id="basketItemSelect"></select></label>
+        <button id="addToBasket" class="primary">➕ הוסף</button>
+      </div>
+      <table id="basketTable">
+        <thead><tr><th>פריט</th><th>קטגוריה</th><th>מחיר ייחוס</th><th>הסר</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div id="budgetResult" class="lcd">סה"כ ₪0</div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="card" style="display:none">
+      <b>איך משחקים?</b>
+      <ul>
+        <li><b>ניקוד:</b> ±5% → 10 | ±15% → 8 | ±30% → 6 | ±50% → 4 | אחרת → 1. בונוס = דרגת קושי (1–3).</li>
+        <li><b>שיפור:</b> אם שיפרת שיא לאותו פריט → +1 נק׳.</li>
+        <li><b>טיפ:</b> אפשר לסנן לפי קטגוריה וקושי, ואז ללחוץ "פריט חדש".</li>
+      </ul>
+      <div id="testsBadge" class="test-badge" style="display:none">בדיקות</div>
+      <ul id="testList" style="line-height:1.7"></ul>
+    </section>
+  </main>
+
+<script>
+'use strict';
+// =====================================================
+// 1) DATA — באנגלית (ליציבות התחביר)
+// =====================================================
+const PRODUCTS=[
+  {category:"Food", name:"לחם פרוס", icon:"🍞", price:9, min:7, max:14, difficulty:1, note:"מאפים"},
+  {category:"Food", name:"שוקולד חלב 100ג׳", icon:"🍫", price:8, min:5, max:12, difficulty:1, note:"מותגים"},
+  {category:"Food", name:"חלב 3% 1ל׳", icon:"🥛", price:7, min:5, max:8, difficulty:1, note:"מקרר"},
+  {category:"Food", name:"פסטה 500ג׳", icon:"🍝", price:6, min:4, max:10, difficulty:1, note:"ספגטי/פנה"},
+  {category:"Food", name:"קורנפלקס 750ג׳", icon:"🥣", price:18, min:12, max:28, difficulty:2, note:"מותגים/בית"},
+  {category:"Produce", name:"עגבניות 1ק", icon:"🍅", price:8, min:5, max:12, difficulty:2, note:"עונתי"},
+  {category:"Produce", name:"בננות 1ק", icon:"🍌", price:9, min:6, max:12, difficulty:2, note:"עונתי"},
+  {category:"Hygiene", name:"שמפו 700מ״ל", icon:"🧴", price:16, min:12, max:28, difficulty:2, note:"משפחתי"},
+  {category:"Cleaning", name:"אבקת כביסה 3ק", icon:"🧼", price:38, min:28, max:65, difficulty:2, note:"מכונה"},
+  {category:"Toys", name:"סט לגו בינוני", icon:"🧱", price:240, min:150, max:450, difficulty:3, note:"פופולרי"},
+  {category:"School", name:"מחברת A4", icon:"📒", price:6, min:3, max:10, difficulty:1, note:"שורות/משבצות"},
+  {category:"Tech", name:"עכבר מחשב", icon:"🖱️", price:45, min:25, max:120, difficulty:1, note:"חוטי/אלחוטי"},
+  {category:"Tech", name:"מקלדת בסיסית", icon:"⌨️", price:79, min:49, max:160, difficulty:2, note:"ממברנה"},
+  {category:"Clothes", name:"טי-שירט ילדים", icon:"👕", price:39, min:25, max:80, difficulty:1, note:"רשתות"}
+];
+
+// =====================================================
+// 2) TABS
+// =====================================================
+const tabs=document.querySelectorAll('.tab-btn');
+const sections={game:document.getElementById('game'),budget:document.getElementById('budget'),about:document.getElementById('about')};
+tabs.forEach(btn=>btn.addEventListener('click',()=>{tabs.forEach(b=>b.classList.remove('active'));btn.classList.add('active');const t=btn.dataset.tab;Object.keys(sections).forEach(k=>sections[k].style.display=k===t?'block':'none');}));
+
+// =====================================================
+// 3) DOM REFS
+// =====================================================
+const catSel=document.getElementById('categorySelect');
+const diffSel=document.getElementById('difficultySelect');
+const elEmoji=document.getElementById('p-emoji');
+const elName=document.getElementById('p-name');
+const elMeta=document.getElementById('p-meta');
+const elResult=document.getElementById('resultBox');
+const lcd=document.getElementById('lcd');
+const enterBtn=document.getElementById('enterBtn');
+
+// Build category select
+const CATEGORIES=[...new Set(PRODUCTS.map(p=>p.category))].sort();
+catSel.innerHTML='<option value="all">כל הקטגוריות</option>'+CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('');
+
+// =====================================================
+// 4) GAME STATE + HELPERS
+// =====================================================
+let current=null, score=0, tries=0, perfects=0, devSum=0; const history=new Map();
+const statScore=document.getElementById('stat-score');
+const statTries=document.getElementById('stat-tries');
+const statPerfect=document.getElementById('stat-perfect');
+const statAvg=document.getElementById('stat-avgdev');
+const fmtN=n=>Number(n).toLocaleString('he-IL',{maximumFractionDigits:0});
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+function filteredProducts(){
+  let arr=PRODUCTS.slice();
+  if(catSel.value!=='all') arr=arr.filter(p=>p.category===catSel.value);
+  if(diffSel.value!=='all') arr=arr.filter(p=>String(p.difficulty)===diffSel.value);
+  return arr;
+}
+
+function nextProduct(){
+  const pool=filteredProducts();
+  if(!pool.length){
+    current=null; elEmoji.textContent='🛒'; elName.textContent='אין פריטים בקטגוריה/קושי שנבחרו'; elMeta.textContent='בחר/י אחרת'; elResult.textContent=''; lcd.textContent='₪0'; return false;
+  }
+  current=pick(pool);
+  elEmoji.textContent=current.icon||'🙂';
+  elName.textContent=current.name;
+  elMeta.textContent=`${current.category} • קושי ${current.difficulty}`;
+  elResult.textContent='מוכן';
+  lcd.textContent='₪0';
+  inputVal='';
+  return true;
+}
+
+function basePoints(d){ if(d<=0.05) return 10; if(d<=0.15) return 8; if(d<=0.30) return 6; if(d<=0.50) return 4; return 1; }
+
+function checkGuess(){
+  if(!current){ elResult.textContent='אין פריט פעיל'; return; }
+  const guess=Number(inputVal||0);
+  if(!Number.isFinite(guess) || inputVal===''){ elResult.textContent='הקלד/י סכום באמצעות הלוח'; return; }
+  const diff=Math.abs(guess-current.price)/Math.max(1,current.price);
+  const base=basePoints(diff); const bonus=current.difficulty||0; let imp=0; const key=current.name;
+  if(!history.has(key)||diff<history.get(key)){ imp=history.has(key)?1:0; history.set(key,diff); }
+  const gained=base+bonus+imp; score+=gained; tries++; devSum+=diff; if(base===10) perfects++;
+  const cls=diff<=0.15?'good':(diff<=0.30?'ok':'bad');
+  elResult.innerHTML=`מחיר: <b>${fmtN(current.price)}</b> ₪ • ניחוש: <b>${fmtN(guess)}</b> ₪ • <span class="${cls}">סטייה ${(diff*100).toFixed(1)}%</span><br><span class="muted">טווח: ${current.min}–${current.max} ₪ • ${current.note||''}</span>`;
+  document.getElementById('stat-score').textContent=fmtN(score);
+  document.getElementById('stat-tries').textContent=tries;
+  document.getElementById('stat-perfect').textContent=perfects;
+  document.getElementById('stat-avgdev').textContent=tries?((devSum/tries*100).toFixed(1)+'%'):'—';
+  const tr=document.createElement('tr'); tr.innerHTML=`<td>${current.icon} ${current.name}</td><td>${fmtN(guess)}</td><td>${fmtN(current.price)}</td><td>${(diff*100).toFixed(1)}%</td>`; document.querySelector('#receiptTable tbody').prepend(tr);
+  document.getElementById('recScore').textContent=fmtN(score);
+}
+
+// ====== KEYPAD ======
+let inputVal='';
+function syncLCD(){ lcd.textContent='₪'+(inputVal||'0'); }
+function pushDigits(str){ if(inputVal.length>7) return; inputVal=(inputVal+str).replace(/^0+(\d)/,'$1'); syncLCD(); }
+function backspace(){ inputVal=inputVal.slice(0,-1); syncLCD(); }
+function clearAll(){ inputVal=''; syncLCD(); }
+
+document.querySelectorAll('.keypad [data-key]').forEach(btn=>btn.addEventListener('click',()=>pushDigits(btn.dataset.key)));
+document.querySelector('[data-act="back"]').addEventListener('click',backspace);
+document.querySelector('[data-act="clear"]').addEventListener('click',clearAll);
+enterBtn.addEventListener('click',checkGuess);
+
+// events for filters
+catSel.addEventListener('change',nextProduct);
+diffSel.addEventListener('change',nextProduct);
+document.getElementById('nextBtn').addEventListener('click',nextProduct);
+
+// first load
+nextProduct();
+
+// =====================================================
+// 5) BUDGET (mini cart)
+// =====================================================
+const basket=[]; const basketBody=document.querySelector('#basketTable tbody');
+const budgetInput=document.getElementById('budgetInput'); const budgetResult=document.getElementById('budgetResult');
+const basketCat=document.getElementById('basketCategory'); const basketItemSel=document.getElementById('basketItemSelect');
+
+basketCat.innerHTML=CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('');
+function fillBasketItems(){ const c=basketCat.value; const items=PRODUCTS.filter(p=>p.category===c); basketItemSel.innerHTML=items.map((p,i)=>`<option value="${i}">${p.icon} ${p.name}</option>`).join(''); }
+basketCat.addEventListener('change', fillBasketItems); fillBasketItems();
+
+function renderBasket(){
+  basketBody.innerHTML=basket.map((it,idx)=>`<tr><td>${it.icon} ${it.name}</td><td>${it.category}</td><td>${fmtN(it.price)} ₪</td><td><button data-i="${idx}">🗑️</button></td></tr>`).join('');
+  basketBody.querySelectorAll('button').forEach(b=>b.onclick=()=>{ basket.splice(Number(b.dataset.i),1); renderBasket(); calcBudget(); });
+  calcBudget();
+}
+function calcBudget(){ const budget=Number(budgetInput.value||0); const sum=basket.reduce((s,it)=>s+it.price,0); const diff=sum-budget; budgetResult.textContent= diff<=0? `🥳 סה"כ: ₪${fmtN(sum)} • נשאר: ₪${fmtN(-diff)}` : `🙈 חריגה: ₪${fmtN(diff)} (סה"כ ₪${fmtN(sum)})`; }
+
+document.getElementById('addToBasket').addEventListener('click',()=>{ const c=basketCat.value; const idx=Number(basketItemSel.value); const list=PRODUCTS.filter(p=>p.category===c); const item=list[idx]; if(item){ basket.push(item); renderBasket(); }});
+document.getElementById('resetBasket').addEventListener('click',()=>{ basket.length=0; renderBasket(); });
+
+// =====================================================
+// 6) TESTS — מעודכן לגרסת הקופה הרושמת
+// =====================================================
+(function runTests(){
+  const badge=document.getElementById('testsBadge'); const ul=document.getElementById('testList'); const out=[]; const ok=(name,cond,extra='')=>{out.push({name,ok:!!cond,extra}); if(!cond) console.error('❌',name); else console.log('✅',name)};
+  try{
+    ok('Array PRODUCTS', Array.isArray(PRODUCTS) && PRODUCTS.length>=10, `n=${PRODUCTS.length}`);
+    ok('categorySelect built', document.getElementById('categorySelect').options.length>=new Set(PRODUCTS.map(p=>p.category)).size);
+    // Empty pool handling
+    const oldC=catSel.value, oldD=diffSel.value; catSel.value='__NONE__'; diffSel.value='3'; const none=nextProduct(); ok('Empty pool safe', !none && document.getElementById('p-name').textContent.includes('אין פריטים')); catSel.value=oldC; diffSel.value=oldD; nextProduct();
+    // Keypad typing
+    clearAll(); pushDigits('1'); pushDigits('2'); pushDigits('3'); ok('LCD shows 123', document.getElementById('lcd').textContent.includes('123'));
+    backspace(); ok('Backspace works', document.getElementById('lcd').textContent.includes('12'));
+    // Scoring exact
+    const ref=current.price; clearAll(); pushDigits(String(ref)); checkGuess(); ok('Exact guess yields 0% text', /0\.0%|0%/.test(document.getElementById('resultBox').textContent));
+    // Basket
+    const bc=document.getElementById('basketCategory'); bc.value=CATEGORIES[0]; bc.dispatchEvent(new Event('change')); ok('Basket items filled', document.getElementById('basketItemSelect').options.length>0);
+  }catch(e){ console.error('Test crash', e); if(badge){badge.style.display='inline-block'; badge.textContent='בדיקות: ERROR';} }
+  finally{ if(badge){badge.style.display='inline-block'; badge.textContent='בדיקות: '+(out.every(t=>t.ok)?'PASS':'FAIL');} if(ul){ ul.innerHTML=out.map(t=>`<li style="color:${t.ok?'#16a34a':'#ef4444'}">${t.ok?'✔️':'❌'} ${t.name} ${t.extra?('— '+t.extra):''}</li>`).join(''); } catSel.value='all'; diffSel.value='all'; nextProduct(); }
+})();
+</script>
+</body>
+</html>

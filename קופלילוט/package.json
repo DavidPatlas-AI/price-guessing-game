@@ -1,0 +1,45 @@
+{
+  "name": "הקופה-הקטנה-פלוס",
+  "version": "1.0.0",
+  "description": "משחק חינוכי לילדים לניחוש מחירים",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx live-server .",
+    "build": "echo 'המשחק מוכן לפריסה!'",
+    "test": "echo 'בדיקות אוטומטיות יתווספו בעתיד'"
+  },
+  "keywords": [
+    "משחק",
+    "חינוכי", 
+    "ילדים",
+    "מחירים",
+    "מתמטיקה",
+    "hebrew",
+    "game",
+    "educational",
+    "kids"
+  ],
+  "author": "קופיילוט ושותפים",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/הקופה-הקטנה-פלוס"
+  },
+  "bugs": {
+    "url": "https://github.com/username/הקופה-הקטנה-פלוס/issues"
+  },
+  "homepage": "https://username.github.io/הקופה-הקטנה-פלוס",
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "serve": "^14.2.1"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

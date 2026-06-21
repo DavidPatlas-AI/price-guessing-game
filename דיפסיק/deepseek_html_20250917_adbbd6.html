@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 משחק המחירים העתידני - מהדורת פרימיום</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #ff6b6b;
+            --success: #51cf66;
+            --warning: #ffd43b;
+            --error: #ff6b6b;
+            --surface: #ffffff;
+            --background: #f8fafc;
+            --text: #2d3748;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 25px rgba(0,0,0,0.1);
+            --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            --gradient-accent: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            --gradient-success: linear-gradient(135deg, #51cf66 0%, #22c55e 100%);
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --neon-primary: 0 0 10px rgba(102, 126, 234, 0.7), 0 0 20px rgba(102, 126, 234, 0.5);
+            --neon-success: 0 0 10px rgba(81, 207, 102, 0.7), 0 0 20px rgba(81, 207, 102, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Assistant', sans-serif;
+            background: var(--gradient-primary);
+            min-height: 100vh;
+            color: var(--text);
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* עיצוב כותרת */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+            animation: glow 3s infinite alternate;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+        }
+
+        .title {
+            font-size: 3.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            animation: titleGlow 2s infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 5px rgba(102, 126, 234, 0.5); }
+            100% { text-shadow: 0 0 15px rgba(102, 126, 234, 0.8), 0 0 25px rgba(118, 75, 162, 0.6); }
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        /* כרטיסי בחירת משחק */
+        .game-modes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .mode-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .mode-card:hover::before {
+            left: 100%;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15), var(--neon-primary);
+        }
+
+        .mode-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+            transition: var(--transition-smooth);
+        }
+
+        .mode-card:hover .mode-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .mode-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+
+        .mode-description {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* אזור המשחק */
+        .game-area {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            position: relative;
+            transition: var(--transition-smooth);
+            border: 1px solid var(--glass-border);
+        }
+
+        /* פס סטטוס */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        /* תצוגת מוצר */
+        .product-showcase {
+            background: var(--gradient-primary);
+            border-radius: 25px;
+            padding: 40px;
+            text-align: center;
+            margin: 30px 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .product-showcase::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .product-stage {
+            position: relative;
+            z-index: 2;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .product-visual {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: var(--transition-smooth);
+            animation: imageEntrance 0.8s ease-out;
+        }
+
+        .product-image:hover {
+            transform: scale(1.05) rotateY(5deg);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        @keyframes imageEntrance {
+            from {
+                opacity: 0;
+                transform: scale(0.8) rotateY(-10deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotateY(0deg);
+            }
+        }
+
+        .product-info {
+            flex: 1;
+            min-width: 300px;
+            text-align: right;
+        }
+
+        .product-emoji {
+            font-size: 3em;
+            display: inline-block;
+            margin: 10px 0;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 250px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8em;
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .product-name {
+            font-size: 2.2em;
+            font-weight: 800;
+            margin: 20px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .product-details {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .detail-chip {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* טיימר */
+        .timer-widget {
+            position: relative;
+            margin: 30px 0;
+        }
+
+        .timer-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent) 0deg, var(--border) 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            position: relative;
+            transition: var(--transition-smooth);
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+        }
+
+        .timer-circle::before {
+            content: '';
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: var(--surface);
+            border-radius: 50%;
+        }
+
+        .timer-text {
+            position: relative;
+            z-index: 2;
+            font-size: 2em;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        /* קלט מחיר */
+        .smart-input {
+            position: relative;
+            margin: 30px 0;
+        }
+
+        .price-input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .price-input {
+            font-size: 2.5em;
+            font-weight: 800;
+            text-align: center;
+            border: 3px solid var(--border);
+            border-radius: 15px;
+            padding: 20px;
+            width: 250px;
+            background: var(--surface);
+            transition: var(--transition-smooth);
+        }
+
+        .price-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+            transform: scale(1.05);
+        }
+
+        .currency-symbol {
+            font-size: 3em;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* כפתורים */
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            min-width: 150px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--gradient-accent);
+            color: white;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2), var(--neon-primary);
+        }
+
+        /* תוצאות */
+        .result-display {
+            margin: 30px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .result-card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--success);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-excellent { 
+            border-left-color: var(--success); 
+            background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+            box-shadow: var(--neon-success);
+        }
+        .result-good { 
+            border-left-color: #22c55e; 
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        }
+        .result-okay { 
+            border-left-color: var(--warning); 
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        }
+        .result-poor { 
+            border-left-color: var(--error); 
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        }
+
+        /* רספונסיביות */
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .title { font-size: 2.5em; }
+            .product-emoji { font-size: 4em; }
+            .price-input { font-size: 1.8em; width: 200px; }
+            .currency-symbol { font-size: 2em; }
+            .action-buttons { flex-direction: column; align-items: center; }
+            .btn { min-width: 200px; }
+            .product-stage { flex-direction: column; }
+            .product-visual, .product-info { min-width: 100%; }
+            .product-image { height: 200px; }
+        }
+
+        .hidden { 
+            display: none; 
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* אנימציית כניסה */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* כפתור בית */
+        .home-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 100;
+            transition: var(--transition-smooth);
+        }
+
+        .home-button:hover {
+            transform: scale(1.1) rotate(360deg);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3), var(--neon-primary);
+        }
+
+        /* אנימציית טעינה */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 5px solid white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        /* אנימציות רקע */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-shape:nth-child(1) { width: 80px; height: 80px; top: 10%; left: 10%; animation-delay: 0s; }
+        .floating-shape:nth-child(2) { width: 120px; height: 120px; top: 20%; right: 20%; animation-delay: 1s; }
+        .floating-shape:nth-child(3) { width: 60px; height: 60px; bottom: 20%; left: 30%; animation-delay: 2s; }
+        .floating-shape:nth-child(4) { width: 100px; height: 100px; bottom: 30%; right: 10%; animation-delay: 3s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* אפקטי חלקיקים */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: particleFloat 3s ease-in-out forwards;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(0) translateX(0) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(var(--y)) translateX(var(--x)) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* אפקטי ניאון */
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(102, 126, 234, 0.5); }
+            100% { box-shadow: 0 0 15px rgba(102, 126, 234, 0.8), 0 0 25px rgba(118, 75, 162, 0.6); }
+        }
+
+        /* אנימציות טקסט */
+        .text-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textShine 3s infinite alternate;
+        }
+
+        @keyframes textShine {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- אנימציות רקע -->
+    <div class="background-animation">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+    </div>
+
+    <!-- כפתור בית -->
+    <div class="home-button" onclick="goHome()">
+        🏠
+    </div>
+
+    <!-- אנימציית טעינה -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">טוען חוויה עתידנית...</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="header fade-in">
+            <h1 class="title">🚀 משחק המחירים העתידני</h1>
+            <p class="subtitle">נחש את המחיר וצבור נקודות בדרך לעתיד!</p>
+        </header>
+
+        <section class="game-modes fade-in">
+            <div class="mode-card" onclick="startGame('easy')">
+                <span class="mode-icon">🌱</span>
+                <h3 class="mode-title">מתחילים</h3>
+                <p class="mode-description">מוצרים יומיומיים במחירים סבירים. מתאים למתחילים שרוצים להתאמן.</p>
+            </div>
+            <div class="mode-card" onclick="startGame('medium')">
+                <span class="mode-icon">🚀</span>
+                <h3 class="mode-title">מתקדמים</h3>
+                <p class="mode-description">מוצרים מיוחדים עם טווח מחירים רחב יותר. אתגר אמיתי לחובבי המחירים.</p>
+            </div>
+            <div class="mode-card" onclick="startGame('hard')">
+                <span class="mode-icon">🔥</span>
+                <h3 class="mode-title">מומחים</h3>
+                <p class="mode-description">מוצרים נדירים ומחירים מפתיעים. רק למומחים אמיתיים שמכירים כל מחיר.</p>
+            </div>
+        </section>
+
+        <main class="game-area fade-in" id="gameArea" style="display: none;">
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-value" id="score">0</span>
+                    <span class="stat-label">נקודות</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="round">1/10</span>
+                    <span class="stat-label">סיבוב</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="streak">0</span>
+                    <span class="stat-label">רצף ניחושים</span>
+                </div>
+            </div>
+
+            <div class="product-showcase">
+                <div class="product-stage">
+                    <div class="product-visual">
+                        <div class="image-placeholder" id="productImage">📱</div>
+                    </div>
+                    <div class="product-info">
+                        <span class="product-emoji" id="productEmoji">📱</span>
+                        <h2 class="product-name" id="productName">סמארטפון מתקדם</h2>
+                        <div class="product-details">
+                            <span class="detail-chip">📅 דגם 2023</span>
+                            <span class="detail-chip">⚡ 128GB</span>
+                            <span class="detail-chip">🎨 שחור מטאלי</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timer-widget">
+                <div class="timer-circle">
+                    <span class="timer-text" id="timer">30</span>
+                </div>
+            </div>
+
+            <div class="smart-input">
+                <div class="price-input-container">
+                    <span class="currency-symbol">₪</span>
+                    <input type="number" class="price-input" id="priceInput" placeholder="0" min="0" onkeypress="handleKeyPress(event)">
+                    <span class="currency-symbol">.00</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="submitGuess()">שלח ניחוש</button>
+                <button class="btn btn-secondary" onclick="skipProduct()">דלג למוצר הבא</button>
+            </div>
+
+            <div class="result-display" id="resultDisplay" style="display: none;">
+                <div class="result-card" id="resultCard">
+                    <h3 id="resultTitle">תוצאה</h3>
+                    <p id="resultMessage">הניחוש שלך היה קרוב מאוד!</p>
+                    <div class="price-comparison">
+                        <p>הניחוש שלך: <span id="userGuess">0</span> ₪</p>
+                        <p>המחיר האמיתי: <span id="actualPrice">0</span> ₪</p>
+                        <p>ההפרש: <span id="priceDifference">0</span> ₪</p>
+                    </div>
+                    <p>קיבלת <span id="pointsEarned">0</span> נקודות!</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- אזורים לאפקטים מיוחדים -->
+    <div class="particles" id="particles"></div>
+
+    <script>
+        // נתוני המשחק
+        let gameData = {
+            score: 0,
+            round: 1,
+            totalRounds: 10,
+            streak: 0,
+            bestStreak: 0,
+            totalGuesses: 0,
+            totalDifference: 0,
+            correctGuesses: 0,
+            currentProduct: null,
+            difficulty: 'medium',
+            timerInterval: null,
+            timeLeft: 30
+        };
+
+        // מאגר מוצרים
+        const products = {
+            easy: [
+                { name: "כיכר לחם", emoji: "🍞", price: 12, image: "🍞", details: ["🧂 טרי", "🥖 מחיטה מלאה"] },
+                { name: "חלב 1 ליטר", emoji: "🥛", price: 6, image: "🥛", details: ["🐄 3% שומן", "📆 טרי עד שבוע"] },
+                { name: "ביצים 12 יח'", emoji: "🥚", price: 18, image: "🥚", details: ["🐓 חופש", "📦 קרטון"] },
+                { name: "בננות 1 ק\"ג", emoji: "🍌", price: 8, image: "🍌", details: ["🌍 מאקוודור", "🍌 בשיל"] },
+                { name: "קפה נמס", emoji: "☕", price: 25, image: "☕", details: ["🔥 200 גרם", "🏆 ברזיל"] }
+            ],
+            medium: [
+                { name: "סמארטפון מתקדם", emoji: "📱", price: 3499, image: "📱", details: ["📅 דגם 2023", "⚡ 128GB", "🎨 שחור מטאלי"] },
+                { name: "אוזניות אלחוטיות", emoji: "🎧", price: 899, image: "🎧", details: ["🔊 Noise Cancelling", "🔵 Bluetooth 5.2", "⚡ 30 שעות"] },
+                { name: "משחק קונסולה", emoji: "🎮", price: 299, image: "🎮", details: ["🌟 גרסת Deluxe", "🏆 Edition Limited", "📦 +תוכן בונוס"] },
+                { name: "שעון חכם", emoji: "⌚", price: 1299, image: "⌚", details: ["❤️ מדד דופק", "🏃‍♂️ GPS", "📱 iOS & Android"] },
+                { name: "מצלמת DSLR", emoji: "📷", price: 4599, image: "📷", details: ["📸 24.2MP", "🎥 4K Video", "🔍 עדשה 18-55mm"] }
+            ],
+            hard: [
+                { name: "טיסה לניו יורק", emoji: "✈️", price: 3899, image: "✈️", details: ["🌎 הלוך חזור", "💺 מחלקת תיירים", "📅 עונה נמוכה"] },
+                { name: "אופניים חשמליים", emoji: "🚴", price: 7899, image: "🚴", details: ["🔋 100km טווח", "⚡ 25km/h", "🛡️ אחריות 3 שנים"] },
+                { name: "כרטיסים לקונצרט", emoji: "🎫", price: 1250, image: "🎫", details: ["🎤 שורה 5", "⭐ VIP Access", "🎁 חוברת זכרון"] },
+                { name: "שעון רולקס", emoji: "⌚", price: 25500, image: "⌚", details: ["💎 פלטינה", "🛡️ Water Resistant", "📜 Certificate"] },
+                { name: "יינות collectible", emoji: "🍷", price: 8999, image: "🍷", details: ["🍇 1998", "🏰 Chateau Margaux", "⭐ 5 Stars"] }
+            ]
+        };
+
+        // אתחול המשחק
+        function initGame() {
+            // הסתרת מסך הטעינה אחרי 2 שניות
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                }, 500);
+            }, 2000);
+
+            // יצירת חלקיקי רקע
+            createParticles();
+        }
+
+        // יצירת חלקיקי רקע
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `${Math.random() * 100}%`;
+                    particle.style.background = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                    particle.style.setProperty('--y', `${Math.random() * 100 - 50}vh`);
+                    particle.style.setProperty('--x', `${Math.random() * 100 - 50}vw`);
+                    particle.style.animationDuration = `${Math.random() * 2 + 2}s`;
+                    container.appendChild(particle);
+                    
+                    // הסרת החלקיק אחרי האנימציה
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 3000);
+                }, i * 100);
+            }
+            
+            // יצירת חלקיקים נוספים כל 3 שניות
+            setInterval(createParticles, 3000);
+        }
+
+        // התחלת משחק לפי רמת קושי
+        function startGame(difficulty) {
+            gameData.difficulty = difficulty;
+            gameData.score = 0;
+            gameData.round = 1;
+            gameData.streak = 0;
+            gameData.totalGuesses = 0;
+            gameData.totalDifference = 0;
+            gameData.correctGuesses = 0;
+            
+            document.querySelector('.game-modes').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            
+            updateStats();
+            loadNewProduct();
+            startTimer();
+        }
+
+        // טעינת מוצר חדש
+        function loadNewProduct() {
+            const productsList = products[gameData.difficulty];
+            gameData.currentProduct = productsList[Math.floor(Math.random() * productsList.length)];
+            
+            document.getElementById('productEmoji').textContent = gameData.currentProduct.emoji;
+            document.getElementById('productName').textContent = gameData.currentProduct.name;
+            document.getElementById('productImage').textContent = gameData.currentProduct.image;
+            
+            const detailsContainer = document.querySelector('.product-details');
+            detailsContainer.innerHTML = '';
+            gameData.currentProduct.details.forEach(detail => {
+                const chip = document.createElement('span');
+                chip.className = 'detail-chip';
+                chip.textContent = detail;
+                detailsContainer.appendChild(chip);
+            });
+            
+            document.getElementById('priceInput').value = '';
+            document.getElementById('resultDisplay').style.display = 'none';
+            
+            gameData.timeLeft = 30;
+            updateTimerDisplay();
+        }
+
+        // עדכון תצוגת הטיימר
+        function updateTimerDisplay() {
+            const timerCircle = document.querySelector('.timer-circle');
+            const degrees = (gameData.timeLeft / 30) * 360;
+            timerCircle.style.background = `conic-gradient(var(--accent) ${degrees}deg, var(--border) ${degrees}deg)`;
+            document.getElementById('timer').textContent = gameData.timeLeft;
+        }
+
+        // התחלת טיימר
+        function startTimer() {
+            if (gameData.timerInterval) {
+                clearInterval(gameData.timerInterval);
+            }
+            
+            gameData.timerInterval = setInterval(() => {
+                gameData.timeLeft--;
+                updateTimerDisplay();
+                
+                if (gameData.timeLeft <= 0) {
+                    clearInterval(gameData.timerInterval);
+                    skipProduct();
+                }
+            }, 1000);
+        }
+
+        // שליחת ניחוש
+        function submitGuess() {
+            const userGuess = parseInt(document.getElementById('priceInput').value);
+            
+            if (isNaN(userGuess) || userGuess <= 0) {
+                // אפקט כישלון
+                createFailEffect();
+                return;
+            }
+            
+            clearInterval(gameData.timerInterval);
+            
+            const actualPrice = gameData.currentProduct.price;
+            const difference = Math.abs(userGuess - actualPrice);
+            const percentageDiff = (difference / actualPrice) * 100;
+            
+            let points = 0;
+            let resultClass = '';
+            let resultTitle = '';
+            let resultMessage = '';
+            
+            gameData.totalGuesses++;
+            gameData.totalDifference += difference;
+            
+            if (percentageDiff <= 5) {
+                // ניחוש מצוין
+                points = 100;
+                gameData.streak++;
+                gameData.correctGuesses++;
+                resultClass = 'result-excellent';
+                resultTitle = 'ניחוש מעולה! 🎯';
+                resultMessage = 'איזה דיוק! כמעט פגעת בול במחיר!';
+                createSuccessEffect();
+            } else if (percentageDiff <= 15) {
+                // ניחוש טוב
+                points = 50;
+                gameData.streak++;
+                gameData.correctGuesses++;
+                resultClass = 'result-good';
+                resultTitle = 'ניחוש טוב! 👍';
+                resultMessage = 'ניחוש קרוב מאוד למחיר האמיתי!';
+                createSuccessEffect();
+            } else if (percentageDiff <= 30) {
+                // ניחוש בסדר
+                points = 25;
+                gameData.streak = 0;
+                resultClass = 'result-okay';
+                resultTitle = 'לא רע! 😊';
+                resultMessage = 'ניחוש בסדר, אבל יכול להיות יותר קרוב.';
+                createOkayEffect();
+            } else {
+                // ניחוש גרוע
+                points = 10;
+                gameData.streak = 0;
+                resultClass = 'result-poor';
+                resultTitle = 'צריך להשתפר! 😅';
+                resultMessage = 'הפעם פספסת בול, אבל אל תתייאש!';
+                createFailEffect();
+            }
+            
+            if (gameData.streak > gameData.bestStreak) {
+                gameData.bestStreak = gameData.streak;
+            }
+            
+            gameData.score += points;
+            
+            // עדכון התצוגה עם התוצאות
+            document.getElementById('userGuess').textContent = userGuess.toLocaleString();
+            document.getElementById('actualPrice').textContent = actualPrice.toLocaleString();
+            document.getElementById('priceDifference').textContent = difference.toLocaleString();
+            document.getElementById('pointsEarned').textContent = points;
+            document.getElementById('resultTitle').textContent = resultTitle;
+            document.getElementById('resultMessage').textContent = resultMessage;
+            
+            const resultCard = document.getElementById('resultCard');
+            resultCard.className = 'result-card ' + resultClass;
+            
+            document.getElementById('resultDisplay').style.display = 'block';
+            updateStats();
+            
+            // מעבר אוטומטי אחרי 3 שניות
+            setTimeout(nextProduct, 3000);
+        }
+
+        // דילוג על מוצר
+        function skipProduct() {
+            clearInterval(gameData.timerInterval);
+            gameData.streak = 0;
+            
+            document.getElementById('userGuess').textContent = 'דילגת';
+            document.getElementById('actualPrice').textContent = gameData.currentProduct.price.toLocaleString();
+            document.getElementById('priceDifference').textContent = 'דילוג';
+            document.getElementById('pointsEarned').textContent = '0';
+            document.getElementById('resultTitle').textContent = 'דילגת על המוצר ⏭️';
+            document.getElementById('resultMessage').textContent = 'אין בעיה, ננסה את הבא!';
+            
+            const resultCard = document.getElementById('resultCard');
+            resultCard.className = 'result-card result-okay';
+            
+            document.getElementById('resultDisplay').style.display = 'block';
+            updateStats();
+            
+            // מעבר אוטומטי אחרי 3 שניות
+            setTimeout(nextProduct, 3000);
+        }
+
+        // עדכון הסטטיסטיקות
+        function updateStats() {
+            document.getElementById('score').textContent = gameData.score;
+            document.getElementById('round').textContent = `${gameData.round}/${gameData.totalRounds}`;
+            document.getElementById('streak').textContent = gameData.streak;
+        }
+
+        // מעבר למוצר הבא
+        function nextProduct() {
+            gameData.round++;
+            
+            if (gameData.round > gameData.totalRounds) {
+                endGame();
+            } else {
+                loadNewProduct();
+                startTimer();
+            }
+        }
+
+        // סיום המשחק
+        function endGame() {
+            document.getElementById('gameArea').style.display = 'none';
+            
+            // יצירת מסך סיום
+            const endScreen = document.createElement('div');
+            endScreen.className = 'header';
+            endScreen.innerHTML = `
+                <h2 class="title">🎮 סיום המשחק!</h2>
+                <p class="subtitle">סיימת את כל הסיבובים, כל הכבוד!</p>
+                <div class="stats-bar" style="margin-top: 30px;">
+                    <div class="stat-item">
+                        <span class="stat-value">${gameData.score}</span>
+                        <span class="stat-label">נקודות סופיות</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">${gameData.correctGuesses}/${gameData.totalRounds}</span>
+                        <span class="stat-label">ניחושים נכונים</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">${gameData.bestStreak}</span>
+                        <span class="stat-label">רצף מוצלח</span>
+                    </div>
+                </div>
+                <div class="action-buttons" style="margin-top: 30px;">
+                    <button class="btn btn-primary" onclick="location.reload()">שחק שוב</button>
+                </div>
+            `;
+            
+            document.querySelector('.container').appendChild(endScreen);
+        }
+
+        // מעבר לעמוד הבית
+        function goHome() {
+            if (gameData.timerInterval) {
+                clearInterval(gameData.timerInterval);
+            }
+            
+            document.getElementById('gameArea').style.display = 'none';
+            document.querySelector('.game-modes').style.display = 'grid';
+            
+            // הסרת מסך סיום אם קיים
+            const endScreen = document.querySelector('.header:last-child');
+            if (endScreen && endScreen.querySelector('.title').textContent.includes('סיום המשחק')) {
+                endScreen.remove();
+            }
+        }
+
+        // טיפול בלחיצת Enter
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                submitGuess();
+            }
+        }
+
+        // יצירת אפקטי הצלחה
+        function createSuccessEffect() {
+            createParticleBurst(30, '#51cf66');
+        }
+
+        // יצירת אפקטי כישלון
+        function createFailEffect() {
+            createParticleBurst(20, '#ff6b6b');
+        }
+
+        // יצירת אפקט בינוני
+        function createOkayEffect() {
+            createParticleBurst(15, '#ffd43b');
+        }
+
+        // יצירת התפרצות חלקיקים
+        function createParticleBurst(count, color) {
+            const container = document.getElementById('particles');
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.background = color;
+                particle.style.left = `${centerX}px`;
+                particle.style.top = `${centerY}px`;
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 50 + Math.random() * 100;
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance;
+                
+                particle.style.setProperty('--y', `${y}px`);
+                particle.style.setProperty('--x', `${x}px`);
+                
+                container.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 3000);
+            }
+        }
+
+        // אתחול המשחק כאשר הדף נטען
+        window.onload = initGame;
+    </script>
+</body>
+</html>

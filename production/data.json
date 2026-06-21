@@ -1,0 +1,352 @@
+{
+  "gameData": {
+    "easy": [
+      {
+        "id": 1,
+        "category": "מכולת",
+        "name": "ק״ג תפוחים",
+        "icon": "🍎",
+        "price": 9,
+        "minPrice": 6,
+        "maxPrice": 12,
+        "difficulty": 1,
+        "hint": "פרי טרי ובריא מסופר או שוק",
+        "image": "assets/images/food/apple.jpg"
+      },
+      {
+        "id": 2,
+        "category": "מכולת",
+        "name": "חלב 1 ליטר",
+        "icon": "🥛",
+        "price": 6,
+        "minPrice": 5,
+        "maxPrice": 7,
+        "difficulty": 1,
+        "hint": "חלב רגיל טרי לכל המשפחה",
+        "image": "assets/images/food/milk.jpg"
+      },
+      {
+        "id": 3,
+        "category": "מכולת",
+        "name": "לחם פרוס",
+        "icon": "🍞",
+        "price": 10,
+        "minPrice": 6,
+        "maxPrice": 16,
+        "difficulty": 1,
+        "hint": "לחם מדף או מאפייה",
+        "image": "assets/images/food/bread.jpg"
+      },
+      {
+        "id": 4,
+        "category": "מכולת",
+        "name": "שוקולד חפיסה",
+        "icon": "🍫",
+        "price": 5,
+        "minPrice": 3,
+        "maxPrice": 8,
+        "difficulty": 1,
+        "hint": "שוקולד רגיל, לא פרימיום",
+        "image": "assets/images/food/chocolate.jpg"
+      },
+      {
+        "id": 5,
+        "category": "ספורט",
+        "name": "כדורגל",
+        "icon": "⚽",
+        "price": 60,
+        "minPrice": 30,
+        "maxPrice": 120,
+        "difficulty": 1,
+        "hint": "כדור איכות בסיסית-בינונית",
+        "image": "assets/images/sports/soccer_ball.jpg"
+      },
+      {
+        "id": 6,
+        "category": "לימודים",
+        "name": "תיק גב בית ספר",
+        "icon": "🎒",
+        "price": 150,
+        "minPrice": 80,
+        "maxPrice": 300,
+        "difficulty": 1,
+        "hint": "תיק מותגים נפוצים",
+        "image": "assets/images/school/backpack.jpg"
+      },
+      {
+        "id": 7,
+        "category": "הלבשה",
+        "name": "טי-שירט ילדים",
+        "icon": "👕",
+        "price": 50,
+        "minPrice": 25,
+        "maxPrice": 80,
+        "difficulty": 1,
+        "hint": "כיתוב או מותג פשוט",
+        "image": "assets/images/clothing/tshirt.jpg"
+      },
+      {
+        "id": 8,
+        "category": "מוצרי חשמל",
+        "name": "קומקום חשמלי",
+        "icon": "☕",
+        "price": 120,
+        "minPrice": 70,
+        "maxPrice": 180,
+        "difficulty": 1,
+        "hint": "קומקום בסיסי לבית",
+        "image": "assets/images/appliances/kettle.jpg"
+      }
+    ],
+    "medium": [
+      {
+        "id": 9,
+        "category": "צעצועים",
+        "name": "סט לגו בינוני",
+        "icon": "🧱",
+        "price": 150,
+        "minPrice": 80,
+        "maxPrice": 300,
+        "difficulty": 2,
+        "hint": "200-400 חלקים, סדרות נפוצות",
+        "image": "assets/images/toys/lego.jpg"
+      },
+      {
+        "id": 10,
+        "category": "מחשבים ואלקטרוניקה",
+        "name": "סמארטפון ביניים",
+        "icon": "📱",
+        "price": 1500,
+        "minPrice": 800,
+        "maxPrice": 3500,
+        "difficulty": 2,
+        "hint": "מותגים נפוצים, לא דגל",
+        "image": "assets/images/electronics/smartphone.jpg"
+      },
+      {
+        "id": 11,
+        "category": "תחבורה אישית",
+        "name": "אופני ילדים",
+        "icon": "🚲",
+        "price": 700,
+        "minPrice": 400,
+        "maxPrice": 1200,
+        "difficulty": 2,
+        "hint": "12-20 אינץ׳, איכות בינונית",
+        "image": "assets/images/transportation/bike.jpg"
+      },
+      {
+        "id": 12,
+        "category": "מוצרי חשמל",
+        "name": "טלוויזיה 55״",
+        "icon": "📺",
+        "price": 2200,
+        "minPrice": 1200,
+        "maxPrice": 3500,
+        "difficulty": 2,
+        "hint": "LED רגיל, לא OLED",
+        "image": "assets/images/appliances/tv.jpg"
+      },
+      {
+        "id": 13,
+        "category": "גאדג'טים",
+        "name": "שעון חכם ילדים",
+        "icon": "⌚",
+        "price": 250,
+        "minPrice": 180,
+        "maxPrice": 450,
+        "difficulty": 2,
+        "hint": "עם GPS ושיחות",
+        "image": "assets/images/gadgets/smartwatch.jpg"
+      },
+      {
+        "id": 14,
+        "category": "כביסה וניקיון",
+        "name": "מכונת כביסה 7 ק״ג",
+        "icon": "🧺",
+        "price": 1500,
+        "minPrice": 900,
+        "maxPrice": 2500,
+        "difficulty": 2,
+        "hint": "דירוג אנרגטי בינוני",
+        "image": "assets/images/appliances/washing_machine.jpg"
+      },
+      {
+        "id": 15,
+        "category": "מיזוג",
+        "name": "מזגן 1 כ״ס",
+        "icon": "❄️",
+        "price": 2000,
+        "minPrice": 1300,
+        "maxPrice": 2800,
+        "difficulty": 2,
+        "hint": "ON/OFF בסיסי",
+        "image": "assets/images/appliances/ac.jpg"
+      }
+    ],
+    "hard": [
+      {
+        "id": 16,
+        "category": "מחשבים ואלקטרוניקה",
+        "name": "מחשב נייד",
+        "icon": "💻",
+        "price": 3000,
+        "minPrice": 1500,
+        "maxPrice": 6000,
+        "difficulty": 3,
+        "hint": "דגמי כניסה לעומת בינוני-גבוה",
+        "image": "assets/images/electronics/laptop.jpg"
+      },
+      {
+        "id": 17,
+        "category": "מוצרי חשמל",
+        "name": "מקרר ביתי",
+        "icon": "🧊",
+        "price": 3000,
+        "minPrice": 1500,
+        "maxPrice": 6000,
+        "difficulty": 3,
+        "hint": "נפח 300-500 ליטר, ללא דלת כפולה",
+        "image": "assets/images/appliances/fridge.jpg"
+      },
+      {
+        "id": 18,
+        "category": "ריהוט",
+        "name": "ספה דו-מושבית",
+        "icon": "🛋️",
+        "price": 1800,
+        "minPrice": 900,
+        "maxPrice": 3500,
+        "difficulty": 3,
+        "hint": "בד או דמוי עור",
+        "image": "assets/images/furniture/sofa.jpg"
+      },
+      {
+        "id": 19,
+        "category": "צעצועים",
+        "name": "סט לגו גדול",
+        "icon": "🧱",
+        "price": 420,
+        "minPrice": 300,
+        "maxPrice": 800,
+        "difficulty": 3,
+        "hint": "400+ חלקים, דגמים מורכבים",
+        "image": "assets/images/toys/lego_big.jpg"
+      },
+      {
+        "id": 20,
+        "category": "חדר ילדים",
+        "name": "מיטת יחיד בסיסית",
+        "icon": "🛏️",
+        "price": 950,
+        "minPrice": 600,
+        "maxPrice": 1500,
+        "difficulty": 3,
+        "hint": "שלד מתכת או עץ",
+        "image": "assets/images/furniture/bed.jpg"
+      }
+    ]
+  },
+  "achievements": [
+    {
+      "id": "perfect_guess",
+      "name": "🎯 ניחוש מושלם",
+      "description": "נחשת מחיר בדיוק מושלם!",
+      "condition": "exact_match"
+    },
+    {
+      "id": "close_guess",
+      "name": "🔥 דיוק גבוה",
+      "description": "נחשת עם פחות מ-10% סטייה",
+      "condition": "under_10_percent"
+    },
+    {
+      "id": "streak_5",
+      "name": "⭐ רצף מעולה",
+      "description": "5 ניחושים טובים ברצף",
+      "condition": "streak_5"
+    },
+    {
+      "id": "beginner",
+      "name": "🌟 מתחיל",
+      "description": "השלמת 10 ניחושים",
+      "condition": "total_10"
+    },
+    {
+      "id": "pro",
+      "name": "🏆 מקצוען",
+      "description": "ממוצע דיוק מעל 80%",
+      "condition": "avg_accuracy_80"
+    },
+    {
+      "id": "perfect_round",
+      "name": "💎 מושלם",
+      "description": "רצף של 10 ניחושים מעולים",
+      "condition": "perfect_10"
+    }
+  ],
+  "categories": [
+    {
+      "id": "food",
+      "name": "מכולת ומזון",
+      "icon": "🍎",
+      "color": "#4CAF50"
+    },
+    {
+      "id": "toys",
+      "name": "צעצועים ומשחקים",
+      "icon": "🧸",
+      "color": "#FF9800"
+    },
+    {
+      "id": "electronics",
+      "name": "מחשבים ואלקטרוניקה",
+      "icon": "💻",
+      "color": "#2196F3"
+    },
+    {
+      "id": "appliances",
+      "name": "מוצרי חשמל",
+      "icon": "🔌",
+      "color": "#9C27B0"
+    },
+    {
+      "id": "clothing",
+      "name": "הלבשה והנעלה",
+      "icon": "👕",
+      "color": "#E91E63"
+    },
+    {
+      "id": "sports",
+      "name": "ספורט ופנאי",
+      "icon": "⚽",
+      "color": "#FF5722"
+    },
+    {
+      "id": "school",
+      "name": "לימודים וחינוך",
+      "icon": "🎒",
+      "color": "#607D8B"
+    },
+    {
+      "id": "furniture",
+      "name": "ריהוט ובית",
+      "icon": "🛋️",
+      "color": "#795548"
+    }
+  ],
+  "config": {
+    "maxPrice": 10000,
+    "minPrice": 0,
+    "defaultDifficulty": "medium",
+    "timeLimit": 30,
+    "pointsSystem": {
+      "perfect": 15,
+      "excellent": 12,
+      "good": 10,
+      "fair": 6,
+      "poor": 3,
+      "miss": 1
+    }
+  }
+}

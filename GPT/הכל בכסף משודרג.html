@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>נחש את המחיר — גרסת ילדים מאוירת</title>
+<style>
+  :root {
+    --bg1: #fef6ff;
+    --bg2: #eaf7ff;
+    --card: #ffffff;
+    --ink: #1f2937;
+    --muted: #64748b;
+    --brand: #ff7ac3;
+    --brand-2: #7cdfff;
+    --brand-3: #ffd166;
+    --good: #22c55e;
+    --warn: #f59e0b;
+    --bad: #ef4444;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family: 'Comic Sans MS', 'Segoe UI', system-ui, -apple-system, Arial;
+    background: radial-gradient(1400px 800px at 80% -10%, var(--bg2), transparent),
+                radial-gradient(1200px 600px at -10% 10%, var(--bg1), transparent),
+                #fff;
+    color: var(--ink);
+  }
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: linear-gradient(90deg, rgba(255,122,195,.15), rgba(124,223,255,.15));
+    border-bottom: 3px dashed rgba(31,41,55,.08);
+    padding: 14px 16px;
+  }
+  .brand { display:flex; align-items:center; gap:10px; }
+  .logo { width:42px; height:42px; background: conic-gradient(from 0deg, var(--brand), var(--brand-2), var(--brand-3), var(--brand)); border-radius: 50%; display:grid; place-items:center; color:#fff; font-weight:800; }
+  .title { font-weight:900; font-size:20px; }
+  .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  .tab-btn {
+    padding:10px 14px; border-radius: 999px; border:3px solid #00000010; background:#fff; cursor:pointer;
+    box-shadow: 0 6px 0 #00000010; font-weight:800;
+  }
+  .tab-btn.active { background: var(--brand-3); border-color: #00000014; }
+  main { max-width: 1000px; margin: 16px auto; padding: 8px; }
+  .card {
+    background: var(--card);
+    border-radius: 24px;
+    border: 3px solid #00000010;
+    box-shadow: 0 10px 0 #0000000d;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .sticker { position:absolute; opacity:.15; font-size:80px; transform: rotate(-15deg); }
+  .sticker.s1 { top:-10px; left:10px; }
+  .sticker.s2 { bottom:-8px; right:12px; transform: rotate(12deg); }
+  .row { display:grid; grid-template-columns: 1fr; gap:12px; }
+  @media(min-width:760px) { .row { grid-template-columns: 1.2fr .8fr; } }
+  .face { display:grid; grid-template-columns: 90px 1fr; gap:10px; align-items:center; }
+  .emoji { width:84px; height:84px; border-radius: 22px; display:grid; place-items:center; font-size:52px;
+           background: linear-gradient(145deg, #fff, #f8fcff); border:3px solid #0000000f; }
+  .name { font-size:26px; font-weight:900; }
+  .sub { color: var(--muted); font-size:14px; }
+  .controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  select, input[type=number] {
+    padding: 12px 14px; border-radius: 14px; border:3px solid #00000010; background:#fff; font-weight:700;
+  }
+  button.primary {
+    padding: 12px 18px; border-radius: 16px; border:3px solid #00000012; background: linear-gradient(180deg, var(--brand-2), #a7ecff);
+    box-shadow: 0 8px 0 #5bbad6; font-weight:900; cursor:pointer;
+  }
+  button.secondary {
+    padding: 10px 14px; border-radius: 16px; border:3px dashed #0000001a; background:#fff; font-weight:900; cursor:pointer;
+  }
+  .result { margin-top:10px; font-size:16px; }
+  .good { color: var(--good); } .ok { color: var(--warn); } .bad { color: var(--bad); }
+  .meter { margin-top:10px; height:18px; background:#f1f5f9; border:3px solid #0000000e; border-radius: 999px; overflow:hidden; }
+  .meter > div { height:100%; width:0%; background: linear-gradient(90deg, #8df0a7, #6ee7b7); transition: width .6s; }
+  .stars { margin-top:8px; font-size:24px; color:#ffd166; text-shadow: 0 2px 0 #d49c2f; }
+  .stats { display:grid; grid-template-columns: repeat(2,1fr); gap:10px; }
+  .stat-box { background: #fff; border:3px solid #00000010; border-radius: 16px; padding: 10px; text-align:center; }
+  .stat-label { color: var(--muted); font-size:12px; }
+  .stat-value { font-weight:900; font-size:22px; }
+  table { width:100%; border-collapse: collapse; font-size:14px; }
+  th,td { border-bottom: 2px dotted #00000014; padding:8px 6px; text-align:right; }
+  th { background: #fffaf0; }
+  .chip { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; background:#fff; border:3px solid #00000010; border-radius: 999px; font-weight:800; }
+  .coin { display:inline-grid; place-items:center; width:28px; height:28px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #fff, #ffd166); border:2px solid #f1b800; }
+  .confetti { position:fixed; inset:0; pointer-events:none; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">₪</div>
+      <div>
+        <div class="title">נחש את המחיר — גרסת ילדים מאוירת</div>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="game">🎮 משחק</button>
+          <button class="tab-btn" data-tab="budget">🧺 סל בתקציב</button>
+          <button class="tab-btn" data-tab="expenses">📊 הוצאות על הילד</button>
+          <button class="tab-btn" data-tab="about">❓ איך משחקים</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- GAME -->
+    <section id="game" class="card">
+      <div class="sticker s1">🎈</div><div class="sticker s2">⭐</div>
+      <div class="row">
+        <div>
+          <div class="face">
+            <div class="emoji" id="p-emoji">🧩</div>
+            <div>
+              <div class="name" id="p-name">שם מוצר</div>
+              <div class="sub" id="p-meta">קטגוריה • קושי</div>
+            </div>
+          </div>
+
+          <div class="controls" style="margin-top:10px;">
+            <span class="chip">קטגוריה
+              <select id="categorySelect"></select>
+            </span>
+            <span class="chip">קושי
+              <select id="difficultySelect">
+                <option value="all">הכל</option>
+                <option value="1">קל</option>
+                <option value="2">בינוני</option>
+                <option value="3">קשה</option>
+              </select>
+            </span>
+            <button class="secondary" id="nextBtn">🎲 פריט חדש</button>
+          </div>
+
+          <div class="controls" style="margin-top:8px;">
+            <span class="chip"><span class="coin">₪</span><input id="guessInput" type="number" min="0" placeholder="כמה עולה?"></span>
+            <button class="primary" id="checkBtn">✅ בדוק</button>
+            <button class="secondary" id="revealBtn">💡 גלה</button>
+          </div>
+
+          <div class="result" id="resultBox"></div>
+          <div class="meter"><div id="meterFill"></div></div>
+          <div class="stars" id="stars">☆☆☆☆☆</div>
+        </div>
+
+        <div>
+          <div class="stats">
+            <div class="stat-box">
+              <div class="stat-label">נקודות</div>
+              <div class="stat-value" id="stat-score">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">ניסיונות</div>
+              <div class="stat-value" id="stat-tries">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">בול (±5%)</div>
+              <div class="stat-value" id="stat-perfect">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">סטייה ממוצעת</div>
+              <div class="stat-value" id="stat-avgdev">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUDGET -->
+    <section id="budget" class="card" style="display:none;">
+      <div class="sticker s1">🛒</div><div class="sticker s2">💳</div>
+      <div class="name" style="font-size:24px; font-weight:900;">סל קניות בתקציב</div>
+      <div class="controls">
+        <span class="chip">תקציב ₪ <input type="number" id="budgetInput" value="300"></span>
+        <button class="secondary" id="resetBasket">♻️ אפס סל</button>
+      </div>
+      <div class="controls">
+        <span class="chip">קטגוריה <select id="basketCategory"></select></span>
+        <span class="chip">פריט <select id="basketItem"></select></span>
+        <button class="primary" id="addToBasket">➕ הוסף</button>
+      </div>
+      <table id="basketTable">
+        <thead><tr><th>פריט</th><th>קטגוריה</th><th>מחיר ייחוס</th><th>הסר</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="result" id="budgetResult"></div>
+    </section>
+
+    <!-- EXPENSES -->
+    <section id="expenses" class="card" style="display:none;">
+      <div class="sticker s1">📚</div><div class="sticker s2">🎂</div>
+      <div class="name" style="font-size:24px; font-weight:900;">הוצאות הורים על ילד</div>
+      <div class="sub">חודשי / שנתי / חד־פעמי — הערכות 2024–2025</div>
+      <table id="expensesTable">
+        <thead>
+          <tr><th>שם הוצאה</th><th>תקופה</th><th>עלות ייחוס</th><th>טווח</th><th>גיל יעד</th><th>הערות</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="card" style="display:none;">
+      <div class="name" style="font-size:24px; font-weight:900;">איך משחקים?</div>
+      <ul>
+        <li><b>ניקוד:</b> ±5% → 10 נק׳ | ±15% → 8 | ±30% → 6 | ±50% → 4 | אחרת → 1. בונוס = דרגת קושי (1–3).</li>
+        <li><b>בונוס שיפור:</b> אם שברת את השיא שלך לאותו פריט → +1 נק׳.</li>
+        <li><b>סל תקציב:</b> בחר/י תקציב, הוסיפ/י פריטים, ובדקו יחד אם נשאר כסף.</li>
+      </ul>
+      <div class="sub">מטרה: ללמוד ערך, בחירה חכמה וכבוד להשקעת ההורים — בכיף 🙂</div>
+    </section>
+  </main>
+
+  <canvas class="confetti" id="confetti"></canvas>
+
+<script>
+  const PRODUCTS = __PRODUCTS__;
+  const EXPENSES = __EXPENSES__;
+
+  const tabs = document.querySelectorAll('.tab-btn');
+  const sections = {
+    game: document.getElementById('game'),
+    budget: document.getElementById('budget'),
+    expenses: document.getElementById('expenses'),
+    about: document.getElementById('about')
+  };
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      Object.keys(sections).forEach(k => sections[k].style.display = (k===tab?'block':'none'));
+    });
+  });
+
+  const uniq = arr => [...new Set(arr)];
+  const fmtN = n => Number(n).toLocaleString('he-IL', {maximumFractionDigits:0});
+  const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+  const cats = uniq(PRODUCTS.map(p=>p["קטגוריה"]).sort());
+
+  // DOM
+  const catSel = document.getElementById('categorySelect');
+  const diffSel = document.getElementById('difficultySelect');
+  const elEmoji = document.getElementById('p-emoji');
+  const elName = document.getElementById('p-name');
+  const elMeta = document.getElementById('p-meta');
+  const elResult = document.getElementById('resultBox');
+  const meterFill = document.getElementById('meterFill');
+  const stars = document.getElementById('stars');
+
+  // Stats
+  let current = null, score=0, tries=0, perfects=0, devSum=0;
+  const history = new Map();
+
+  const statScore = document.getElementById('stat-score');
+  const statTries = document.getElementById('stat-tries');
+  const statPerfect = document.getElementById('stat-perfect');
+  const statAvg = document.getElementById('stat-avgdev');
+
+  // Sounds
+  const ctx = new (window.AudioContext||window.webkitAudioContext)();
+  function beep(freq=880, time=0.12, type='sine'){
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type=type; o.frequency.value=freq;
+    o.connect(g); g.connect(ctx.destination);
+    g.gain.value=0.12; o.start();
+    setTimeout(()=>{g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+time); o.stop(ctx.currentTime+time);}, time*1000);
+  }
+  function yay(){
+    beep(1046,.08,'triangle'); setTimeout(()=>beep(1318,.08,'triangle'),90); setTimeout(()=>beep(1567,.1,'triangle'),180);
+  }
+  function oops(){
+    beep(220,.14,'sawtooth'); setTimeout(()=>beep(180,.12,'sawtooth'),120);
+  }
+
+  // Confetti
+  const cv = document.getElementById('confetti');
+  const c = cv.getContext('2d');
+  let confetti = [];
+  function addConfetti(x, y){ for(let i=0;i<60;i++) confetti.push({x,y, vx:(Math.random()-0.5)*6, vy:(Math.random()*-4)-2, r:2+Math.random()*4, col:['#ff7ac3','#7cdfff','#ffd166'][i%3]}); }
+  function tick(){
+    const dpr = window.devicePixelRatio||1;
+    cv.width = innerWidth*dpr; cv.height = innerHeight*dpr; c.scale(dpr,dpr);
+    c.clearRect(0,0,innerWidth,innerHeight);
+    confetti.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.15; p.vx*=0.99;
+      c.fillStyle=p.col; c.beginPath(); c.arc(p.x,p.y,p.r,0,Math.PI*2); c.fill();
+    });
+    confetti = confetti.filter(p=>p.y<innerHeight+20);
+    requestAnimationFrame(tick);
+  } requestAnimationFrame(tick);
+
+  // Build selects
+  catSel.innerHTML = '<option value="all">כל הקטגוריות</option>' + uniq(PRODUCTS.map(p=>p["קטגוריה"]).sort()).map(c=>`<option value="${c}">${c}</option>`).join('');
+
+  // Basket selects
+  const basketCat = document.getElementById('basketCategory');
+  const basketItem = document.getElementById('basketItem');
+  basketCat.innerHTML = uniq(PRODUCTS.map(p=>p["קטגוריה"]).sort()).map(c=>`<option value="${c}">${c}</option>`).join('');
+  function fillBasketItems(){
+    const c = basketCat.value;
+    const items = PRODUCTS.filter(p=>p["קטגוריה"]===c);
+    basketItem.innerHTML = items.map((p,i)=>`<option value="${i}">${p["אייקון"]} ${p["שם מוצר"]}</option>`).join('');
+  }
+  basketCat.addEventListener('change', fillBasketItems); fillBasketItems();
+
+  function filteredProducts(){
+    let arr = PRODUCTS.slice();
+    if (catSel.value!=='all') arr = arr.filter(p=>p["קטגוריה"]===catSel.value);
+    if (diffSel.value!=='all') arr = arr.filter(p=>String(p["דרגת קושי (1–3)"])===diffSel.value);
+    return arr;
+  }
+
+  function nextProduct(){
+    const pool = filteredProducts();
+    current = pool.length? pick(pool) : null;
+    if(!current) return;
+    elEmoji.textContent = current["אייקון"] || "🙂";
+    elName.textContent = current["שם מוצר"];
+    elMeta.textContent = `${current["קטגוריה"]} • קושי ${current["דרגת קושי (1–3)"]}`;
+    elResult.innerHTML = '';
+    meterFill.style.width = '0%';
+    stars.textContent = '☆☆☆☆☆';
+    document.getElementById('guessInput').value = '';
+  }
+
+  function starify(base){
+    const map = {10:5, 8:4, 6:3, 4:2, 1:1};
+    const s = map[base] || 1;
+    return '★'.repeat(s)+'☆'.repeat(5-s);
+  }
+
+  function scoreGuess(){
+    if(!current) return;
+    const gEl = document.getElementById('guessInput');
+    const guess = Number(gEl.value);
+    if(!guess && guess!==0) { elResult.innerHTML = '<span class="bad">הקלד/י ניחוש בשקלים 🙂</span>'; oops(); return; }
+    const ref = Number(current["מחיר ייחוס (₪)"]);
+    const diff = Math.abs(guess - ref) / Math.max(ref,1);
+    let base=1;
+    if(diff<=0.05) base=10; else if(diff<=0.15) base=8; else if(diff<=0.30) base=6; else if(diff<=0.50) base=4; else base=1;
+    const bonus = Number(current["דרגת קושי (1–3)"])||0;
+
+    let imp = 0;
+    const key = current["שם מוצר"];
+    if(!history.has(key) || diff < history.get(key)) { imp = history.has(key)?1:0; history.set(key, diff); }
+
+    const gained = base + bonus + imp;
+    score += gained;
+    tries++; devSum+=diff; if(base===10) perfects++;
+
+    const cls = diff<=0.15? 'good' : (diff<=0.30? 'ok':'bad');
+    elResult.innerHTML = `ניחוש: <b>${guess.toLocaleString('he-IL')}</b> ₪ • מחיר ייחוס: <b>${ref.toLocaleString('he-IL')}</b> ₪
+    <br><span class="${cls}">סטייה: ${(diff*100).toFixed(1)}% • נק׳ בסיס: ${base} • בונוס קושי: ${bonus} • שיפור: ${imp} → <b>+${gained}</b></span>
+    <br><span class="sub">טווח טיפוסי: ${current["טווח מינ׳ (₪)"]}–${current["טווח מקס׳ (₪)"]} ₪ • ${current["הערות"]||""}</span>`;
+    meterFill.style.width = Math.max(5, 100 - diff*100) + '%';
+    stars.textContent = starify(base);
+
+    statScore.textContent = fmtN(score);
+    statTries.textContent = tries;
+    statPerfect.textContent = perfects;
+    statAvg.textContent = tries? ((devSum/tries*100).toFixed(1)+'%') : '—';
+
+    if(base>=8){
+      yay();
+      addConfetti(innerWidth*0.8, 60);
+    } else { oops(); }
+  }
+
+  function reveal(){
+    if(!current) return;
+    const ref = Number(current["מחיר ייחוס (₪)"]);
+    elResult.innerHTML = `💡 המחיר הייחוסי: <b>${ref.toLocaleString('he-IL')}</b> ₪`;
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', nextProduct);
+  document.getElementById('checkBtn').addEventListener('click', scoreGuess);
+  document.getElementById('revealBtn').addEventListener('click', reveal);
+  catSel.addEventListener('change', nextProduct);
+  diffSel.addEventListener('change', nextProduct);
+  nextProduct();
+
+  // Budget
+  const basket = [];
+  const basketBody = document.querySelector('#basketTable tbody');
+  const budgetInput = document.getElementById('budgetInput');
+  const budgetResult = document.getElementById('budgetResult');
+
+  const basketCategory = document.getElementById('basketCategory');
+  const basketItem = document.getElementById('basketItem');
+
+  function renderBasket(){
+    basketBody.innerHTML = basket.map((it,idx)=>`
+      <tr>
+        <td>${it["אייקון"]} ${it["שם מוצר"]}</td>
+        <td>${it["קטגוריה"]}</td>
+        <td>${fmtN(it["מחיר ייחוס (₪)"])} ₪</td>
+        <td><button class="secondary" data-i="${idx}">🗑️</button></td>
+      </tr>
+    `).join('');
+    basketBody.querySelectorAll('button').forEach(b=>b.onclick=(e)=>{
+      basket.splice(Number(b.dataset.i),1);
+      renderBasket(); calcBudget();
+    });
+    calcBudget();
+  }
+
+  function calcBudget(){
+    const budget = Number(budgetInput.value||0);
+    const sum = basket.reduce((s,it)=>s+Number(it["מחיר ייחוס (₪)"]),0);
+    const diff = sum - budget;
+    const good = diff<=0;
+    budgetResult.innerHTML = good
+      ? `🥳 עמדתם בתקציב! סה״כ: <b>${fmtN(sum)}</b> ₪ • נשאר: <b>${fmtN(-diff)}</b> ₪`
+      : `🙈 חריגה מהתקציב! סה״כ: <b>${fmtN(sum)}</b> ₪ • חריגה: <b>${fmtN(diff)}</b> ₪`;
+    if(good) addConfetti(innerWidth*0.2, 60);
+  }
+
+  document.getElementById('addToBasket').addEventListener('click', ()=>{
+    const c = basketCategory.value;
+    const idx = Number(basketItem.value);
+    const list = PRODUCTS.filter(p=>p["קטגוריה"]===c);
+    const item = list[idx];
+    if(item){ basket.push(item); renderBasket(); }
+  });
+  document.getElementById('resetBasket').addEventListener('click', ()=>{ basket.length = 0; renderBasket(); });
+
+  function fillBasket(){
+    const c = basketCategory.value || cats[0];
+    const items = PRODUCTS.filter(p=>p["קטגוריה"]===c);
+    basketItem.innerHTML = items.map((p,i)=>`<option value="${i}">${p["אייקון"]} ${p["שם מוצר"]}</option>`).join('');
+  }
+  basketCategory.addEventListener('change', fillBasket);
+  fillBasket();
+</script>
+</body>
+</html>
