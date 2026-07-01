@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>הקופה הקטנה פרו — משחק ניחוש מחירים</title>
+  <meta name="description" content="משחק חינוכי לילדים לניחוש מחירים - למד על כסף וכלכלה בצורה מהנה!">
+  <meta property="og:title" content="הקופה הקטנה פרו">
+  <meta property="og:description" content="משחק חינוכי לילדים לניחוש מחירים">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>₪</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="logo">₪ הקופה הקטנה פרו</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="game">🎮 משחק</button>
+      <button class="tab-btn" data-tab="teacher">👩‍🏫 מורה</button>
+      <button class="tab-btn" data-tab="receipt">🧾 קבלה</button>
+      <button class="tab-btn" data-tab="achievements">🏆 הישגים</button>
+    </div>
+    <div class="controls-bar">
+      <button class="control-btn" id="darkToggle">🌓 מצב לילה</button>
+      <button class="control-btn" id="helpBtn">❓ עזרה</button>
+    </div>
+  </header>
+  
+  <main>
+    <!-- משחק רגיל -->
+    <section id="game" class="tab-content active">
+      <div class="game-header">
+        <div class="level-select">
+          <label for="levelSelect">רמת קושי:</label>
+          <select id="levelSelect">
+            <option value="easy">📱 קל (עד 200₪)</option>
+            <option value="medium" selected>🎯 בינוני (עד 3000₪)</option>
+            <option value="hard">🔥 קשה (עד 10000₪)</option>
+          </select>
+        </div>
+        
+        <div class="score-display">
+          <div class="score">נקודות: <span id="score">0</span></div>
+          <div class="streak">רצף: <span id="streak">0</span></div>
+          <div class="timer">⏱️ <span id="timer">30</span></div>
+        </div>
+      </div>
+      
+      <div class="product-card">
+        <div class="product-image">
+          <img id="productImage" src="" alt="תמונת מוצר" style="display: none;">
+          <div class="product-emoji" id="productEmoji">🍎</div>
+        </div>
+        <div class="product-info">
+          <div class="product-name" id="productName">שם מוצר</div>
+          <div class="product-meta" id="productMeta">קטגוריה • רמה</div>
+          <div class="product-hint" id="productHint">רמז על המוצר</div>
+        </div>
+      </div>
+      
+      <!-- סליידר חכם חדש -->
+      <div class="price-slider-container">
+        <div class="price-display">
+          <span class="currency">₪</span>
+          <span id="priceValue">0</span>
+        </div>
+        
+        <div class="slider-wrapper">
+          <div class="slider-track" id="sliderTrack">
+            <div class="slider-fill" id="sliderFill"></div>
+            <div class="slider-handle" id="sliderHandle">
+              <div class="handle-tooltip" id="handleTooltip">0₪</div>
+            </div>
+          </div>
+          <div class="slider-labels">
+            <span>0</span>
+            <span id="maxLabel">10,000₪</span>
+          </div>
+        </div>
+        
+        <!-- כפתורי קפיצה מהירה -->
+        <div class="quick-buttons">
+          <button class="quick-btn" data-value="10">10₪</button>
+          <button class="quick-btn" data-value="50">50₪</button>
+          <button class="quick-btn" data-value="100">100₪</button>
+          <button class="quick-btn" data-value="500">500₪</button>
+          <button class="quick-btn" data-value="1000">1K₪</button>
+          <button class="quick-btn" data-value="5000">5K₪</button>
+        </div>
+      </div>
+      
+      <div class="game-actions">
+        <button class="action-btn primary" id="submitBtn">✅ נחש!</button>
+        <button class="action-btn secondary" id="hintBtn">💡 רמז</button>
+        <button class="action-btn secondary" id="skipBtn">⏭️ דלג</button>
+      </div>
+      
+      <div class="result-display" id="resultDisplay" style="display: none;">
+        <div class="result-text" id="resultText"></div>
+        <div class="result-details" id="resultDetails"></div>
+        <div class="result-points" id="resultPoints"></div>
+      </div>
+    </section>
+
+    <!-- מצב מורה -->
+    <section id="teacher" class="tab-content">
+      <div class="teacher-panel">
+        <h2>🎓 פאנל מורה</h2>
+        
+        <div class="class-setup">
+          <h3>הגדרת כיתה</h3>
+          <div class="form-group">
+            <label for="className">שם כיתה:</label>
+            <input type="text" id="className" placeholder="כיתה ו׳1">
+          </div>
+          <div class="form-group">
+            <label for="gameMode">מצב משחק:</label>
+            <select id="gameMode">
+              <option value="practice">תרגול חופשי</option>
+              <option value="timed">מצב זמן (2 דקות)</option>
+              <option value="tournament">טורניר כיתתי</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="maxQuestions">מספר שאלות:</label>
+            <input type="number" id="maxQuestions" value="10" min="5" max="20">
+          </div>
+        </div>
+        
+        <div class="class-actions">
+          <button class="action-btn primary" id="startClassGame">🚀 התחל משחק כיתתי</button>
+          <button class="action-btn secondary" id="exportResults">📊 ייצא תוצאות</button>
+          <button class="action-btn secondary" id="resetClass">🔄 אפס כיתה</button>
+        </div>
+        
+        <div class="student-list" id="studentList">
+          <h3>רשימת תלמידים</h3>
+          <div class="add-student">
+            <input type="text" id="studentName" placeholder="שם תלמיד">
+            <button id="addStudent">➕ הוסף</button>
+          </div>
+          <div class="students-grid" id="studentsGrid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- קבלה -->
+    <section id="receipt" class="tab-content">
+      <div class="receipt-container">
+        <div class="receipt-header">
+          <h2>🧾 קבלת משחק</h2>
+          <button class="action-btn secondary" id="printReceipt">🖨️ הדפס</button>
+        </div>
+        
+        <div class="receipt-content" id="receiptContent">
+          <div class="receipt-shop">
+            <div class="shop-name">הקופה הקטנה פרו</div>
+            <div class="shop-details">משחק ניחוש מחירים חינוכי</div>
+            <div class="receipt-date" id="receiptDate"></div>
+          </div>
+          
+          <div class="receipt-items" id="receiptItems">
+            <!-- פריטים יתווספו כאן דינמית -->
+          </div>
+          
+          <div class="receipt-summary">
+            <div class="summary-row">
+              <span>סה״כ שאלות:</span>
+              <span id="totalQuestions">0</span>
+            </div>
+            <div class="summary-row">
+              <span>תשובות נכונות:</span>
+              <span id="correctAnswers">0</span>
+            </div>
+            <div class="summary-row">
+              <span>דיוק ממוצע:</span>
+              <span id="averageAccuracy">0%</span>
+            </div>
+            <div class="summary-row total">
+              <span>נקודות סופיות:</span>
+              <span id="finalScore">0</span>
+            </div>
+          </div>
+          
+          <div class="receipt-footer">
+            <div>תודה שלמדת איתנו!</div>
+            <div>💰 הכל בכסף - הכיף בחינם! 💰</div>
+          </div>
+        </div>
+        
+        <div class="share-actions">
+          <button class="action-btn primary" id="shareResults">📤 שתף תוצאות</button>
+          <button class="action-btn secondary" id="saveResults">💾 שמור</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- הישגים -->
+    <section id="achievements" class="tab-content">
+      <div class="achievements-container">
+        <h2>🏆 הישגים</h2>
+        <div class="achievements-grid" id="achievementsGrid">
+          <!-- הישגים יתווספו כאן דינמית -->
+        </div>
+        
+        <div class="statistics">
+          <h3>📊 סטטיסטיקות</h3>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-number" id="totalGames">0</div>
+              <div class="stat-label">משחקים</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="totalScore">0</div>
+              <div class="stat-label">נקודות</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="bestStreak">0</div>
+              <div class="stat-label">רצף הטוב</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="avgAccuracy">0%</div>
+              <div class="stat-label">דיוק ממוצע</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- מודל עזרה -->
+  <div class="modal" id="helpModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>❓ איך לשחק</h3>
+        <button class="modal-close" id="closeHelp">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="help-section">
+          <h4>🎯 מטרת המשחק</h4>
+          <p>נחש את המחיר הנכון של מוצרים שונים ולמד על כלכלה בצורה מהנה!</p>
+        </div>
+        
+        <div class="help-section">
+          <h4>🎮 איך לשחק</h4>
+          <ol>
+            <li>בחר רמת קושי (קל/בינוני/קשה)</li>
+            <li>הסתכל על המוצר והקטגוריה שלו</li>
+            <li>השתמש בסליידר או בכפתורי הקפיצה לניחוש המחיר</li>
+            <li>לחץ על "נחש!" כדי לראות כמה קרוב היית</li>
+            <li>צבור נקודות על פי הדיוק שלך</li>
+          </ol>
+        </div>
+        
+        <div class="help-section">
+          <h4>🏆 ניקוד</h4>
+          <ul>
+            <li><strong>מושלם (0% סטייה):</strong> 15 נקודות</li>
+            <li><strong>מעולה (עד 5%):</strong> 12 נקודות</li>
+            <li><strong>טוב (עד 10%):</strong> 10 נקודות</li>
+            <li><strong>בינוני (עד 30%):</strong> 6 נקודות</li>
+            <li><strong>נמוך (מעל 30%):</strong> 3 נקודות</li>
+          </ul>
+        </div>
+        
+        <div class="help-section">
+          <h4>⌨️ קיצורי מקלדת</h4>
+          <ul>
+            <li><strong>Enter/רווח:</strong> נחש</li>
+            <li><strong>H:</strong> רמז</li>
+            <li><strong>S:</strong> דלג</li>
+            <li><strong>Escape:</strong> סגור חלונות</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

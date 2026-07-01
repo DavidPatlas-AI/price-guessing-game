@@ -1,0 +1,92 @@
+{
+  "name": "קופה-קטנה-פרו",
+  "version": "2.0.0",
+  "description": "משחק חינוכי מתקדם לניחוש מחירים - גרסת פרודקשן",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve . -p 3000",
+    "dev": "npx live-server . --port=3000 --host=localhost",
+    "build": "echo '✅ הקופה הקטנה פרו מוכנה לפריסה!'",
+    "deploy:netlify": "npx netlify deploy --prod --dir=.",
+    "deploy:vercel": "npx vercel --prod",
+    "preview": "npx serve . -p 8080",
+    "test": "echo '🧪 בדיקות איכות:'",
+    "test:html": "npx html-validate index.html",
+    "test:css": "npx stylelint styles.css",
+    "test:js": "npx eslint game.js",
+    "lint": "npm run test:html && npm run test:css && npm run test:js",
+    "optimize": "echo '⚡ אופטימיזציה:'",
+    "lighthouse": "npx lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html"
+  },
+  "keywords": [
+    "משחק",
+    "חינוכי",
+    "ילדים",
+    "מחירים",
+    "כלכלה",
+    "עברית",
+    "hebrew",
+    "educational",
+    "game",
+    "kids",
+    "price",
+    "economics",
+    "cash-register",
+    "learning",
+    "math",
+    "money"
+  ],
+  "author": {
+    "name": "הקופה הקטנה פרו",
+    "email": "info@cash-register-pro.com",
+    "url": "https://cash-register-pro.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/קופה-קטנה-פרו.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/קופה-קטנה-פרו/issues"
+  },
+  "homepage": "https://your-username.github.io/קופה-קטנה-פרו",
+  "devDependencies": {
+    "serve": "^14.2.1",
+    "live-server": "^1.2.2",
+    "netlify-cli": "^17.10.1",
+    "vercel": "^32.5.3",
+    "html-validate": "^8.7.0",
+    "stylelint": "^15.11.0",
+    "eslint": "^8.53.0",
+    "lighthouse": "^11.3.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie <= 11"
+  ],
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "files": [
+    "index.html",
+    "styles.css",
+    "game.js",
+    "data.json",
+    "assets/",
+    "README.md",
+    "LICENSE"
+  ],
+  "config": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "funding": {
+    "type": "patreon",
+    "url": "https://patreon.com/cash-register-pro"
+  },
+  "peerDependencies": {},
+  "optionalDependencies": {}
+}

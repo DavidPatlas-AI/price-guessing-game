@@ -1,0 +1,1094 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>הקופה הקטנה פרימיום - גרסה אולטימטיבית</title>
+
+  <!-- פונטים מתקדמים -->
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* צבעי בסיס */
+      --primary-dark: #1c1c1c;
+      --primary-medium: #2a2a2a;
+      --primary-light: #3d3d3d;
+      --surface: #525252;
+      
+      /* צבעי מבטא */
+      --accent-gold: #ffd700;
+      --accent-orange: #ff8f00;
+      --accent-green: #00e676;
+      --accent-blue: #2196f3;
+      --accent-red: #f44336;
+      
+      /* מסך LED */
+      --screen-bg: #0a1929;
+      --screen-text: #00ff88;
+      --screen-glow: #00ff88;
+      --screen-shadow: rgba(0,255,136,0.5);
+      
+      /* כפתורים */
+      --btn-bg: linear-gradient(145deg, #505050, #383838);
+      --btn-hover: linear-gradient(145deg, #5a5a5a, #424242);
+      --btn-active: linear-gradient(145deg, #353535, #2d2d2d);
+      --btn-shadow-light: rgba(255,255,255,0.15);
+      --btn-shadow-dark: rgba(0,0,0,0.4);
+      
+      /* קבלה */
+      --receipt-bg: #fafafa;
+      --receipt-border: #e0e0e0;
+      --receipt-shadow: rgba(0,0,0,0.15);
+      
+      /* צבעי סטטוס */
+      --success: #4caf50;
+      --warning: #ff9800;
+      --error: #f44336;
+      --info: #2196f3;
+    }
+
+    /* בסיס עם רקע מתקדם */
+    body {
+      margin: 0;
+      font-family: 'Heebo', sans-serif;
+      background: 
+        radial-gradient(ellipse at top, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%),
+        linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* כפתור החלפת ערכת צבעים */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(33,150,243,0.3);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(33,150,243,0.4);
+    }
+
+    /* מסגרת הקופה עם אפקטים תלת-ממדיים */
+    .register-container {
+      perspective: 1000px;
+      transform-style: preserve-3d;
+    }
+
+    .register-body {
+      background: 
+        linear-gradient(145deg, var(--primary-dark) 0%, var(--primary-medium) 50%, var(--primary-light) 100%);
+      border-radius: 24px;
+      padding: 28px;
+      width: 420px;
+      box-shadow: 
+        0 25px 50px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        inset 0 -1px 0 rgba(0,0,0,0.3);
+      position: relative;
+      transform: rotateX(5deg) rotateY(-2deg);
+      transition: all 0.5s ease;
+    }
+
+    .register-body:hover {
+      transform: rotateX(0deg) rotateY(0deg) scale(1.02);
+      box-shadow: 
+        0 30px 60px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+
+    /* לוגו מותג */
+    .brand-logo {
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--accent-gold);
+      font-weight: 900;
+      font-size: 16px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      letter-spacing: 1px;
+    }
+
+    /* מסך דיגיטלי מתקדם */
+    .screen-container {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .screen {
+      background: var(--screen-bg);
+      color: var(--screen-text);
+      font-family: 'JetBrains Mono', 'Orbitron', monospace;
+      font-size: 36px;
+      font-weight: 700;
+      padding: 18px 24px;
+      border-radius: 12px;
+      text-align: left;
+      letter-spacing: 2px;
+      box-shadow:
+        inset 0 0 20px var(--screen-shadow),
+        inset 0 2px 4px rgba(0,0,0,0.5),
+        0 6px 16px rgba(0,0,0,0.4);
+      border: 2px solid rgba(0,255,136,0.3);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    /* אפקט scanlines למסך */
+    .screen::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(0,255,136,0.1) 25%, 
+        rgba(0,255,136,0.2) 50%, 
+        rgba(0,255,136,0.1) 75%, 
+        transparent 100%);
+      animation: scanline 4s infinite linear;
+      pointer-events: none;
+    }
+
+    .screen::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        repeating-linear-gradient(
+          0deg,
+          transparent 0px,
+          rgba(0,0,0,0.03) 1px,
+          transparent 2px
+        );
+      pointer-events: none;
+    }
+
+    @keyframes scanline {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    /* אינדיקטור סטטוס */
+    .status-indicator {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse-led 2s infinite;
+    }
+
+    @keyframes pulse-led {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* תצוגת מוצר מתקדמת */
+    .product-display {
+      background: linear-gradient(145deg, var(--primary-light), var(--primary-medium));
+      border-radius: 16px;
+      padding: 16px;
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 
+        inset 0 2px 4px rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .product-display:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        inset 0 2px 4px rgba(0,0,0,0.3),
+        0 8px 16px rgba(0,0,0,0.3);
+    }
+
+    .product-emoji {
+      font-size: 48px;
+      width: 64px;
+      height: 64px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
+      border-radius: 16px;
+      box-shadow: 0 4px 8px rgba(255,215,0,0.3);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-4px); }
+    }
+
+    .product-info {
+      flex: 1;
+      color: #e0e0e0;
+    }
+
+    .product-name {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--accent-gold);
+    }
+
+    .product-category {
+      font-size: 14px;
+      opacity: 0.8;
+      color: #bbb;
+    }
+
+    /* חריץ קבלה מתקדם */
+    .receipt-slot {
+      width: 100%;
+      height: 24px;
+      background: linear-gradient(145deg, var(--primary-medium), var(--primary-dark));
+      margin: 20px 0;
+      border-radius: 8px;
+      box-shadow: 
+        inset 0 4px 8px rgba(0,0,0,0.5),
+        0 2px 4px rgba(0,0,0,0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .receipt-slot::before {
+      content: '📄 RECEIPT';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      color: #666;
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 700;
+    }
+
+    .receipt-slot::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--accent-green);
+      box-shadow: 0 0 6px var(--accent-green);
+      animation: receipt-scan 3s infinite;
+    }
+
+    @keyframes receipt-scan {
+      0%, 90%, 100% { opacity: 0; }
+      5%, 85% { opacity: 1; }
+    }
+
+    /* מקלדת מתקדמת עם אפקטים */
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .keypad button {
+      aspect-ratio: 1;
+      background: var(--btn-bg);
+      color: #e8e8e8;
+      font-size: 28px;
+      font-weight: 900;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 
+        0 6px 0 #2a2a2a,
+        inset 0 2px 0 var(--btn-shadow-light),
+        inset 0 -2px 0 var(--btn-shadow-dark),
+        0 8px 16px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Orbitron', monospace;
+    }
+
+    .keypad button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.6s ease;
+      pointer-events: none;
+    }
+
+    .keypad button:hover {
+      background: var(--btn-hover);
+      transform: translateY(-2px);
+      box-shadow: 
+        0 8px 0 #2a2a2a,
+        inset 0 2px 0 var(--btn-shadow-light),
+        inset 0 -2px 0 var(--btn-shadow-dark),
+        0 12px 20px rgba(0,0,0,0.3);
+    }
+
+    .keypad button:active {
+      background: var(--btn-active);
+      transform: translateY(4px);
+      box-shadow: 
+        0 2px 0 #2a2a2a,
+        inset 0 2px 0 var(--btn-shadow-dark),
+        0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .keypad button:active::before {
+      width: 120px;
+      height: 120px;
+    }
+
+    .keypad .wide {
+      grid-column: span 3;
+      background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
+      color: #333;
+      font-weight: 900;
+      box-shadow: 
+        0 6px 0 #cc8800,
+        0 8px 16px rgba(255,140,0,0.3);
+    }
+
+    .keypad .wide:hover {
+      box-shadow: 
+        0 8px 0 #cc8800,
+        0 12px 20px rgba(255,140,0,0.4);
+    }
+
+    .keypad .wide:active {
+      box-shadow: 
+        0 2px 0 #cc8800,
+        0 4px 8px rgba(255,140,0,0.2);
+    }
+
+    /* כפתורי פעולה */
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .action-btn {
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      font-family: 'Heebo', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .check-btn {
+      background: linear-gradient(145deg, var(--success), #388e3c);
+      color: white;
+      box-shadow: 0 4px 8px rgba(76,175,80,0.3);
+    }
+
+    .clear-btn {
+      background: linear-gradient(145deg, var(--error), #d32f2f);
+      color: white;
+      box-shadow: 0 4px 8px rgba(244,67,54,0.3);
+    }
+
+    .hint-btn {
+      background: linear-gradient(145deg, var(--info), #1976d2);
+      color: white;
+      box-shadow: 0 4px 8px rgba(33,150,243,0.3);
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+
+    /* תצוגת תוצאה מתקדמת */
+    .resultBox {
+      background: linear-gradient(145deg, var(--primary-light), var(--primary-medium));
+      color: #e8e8e8;
+      margin: 20px 0;
+      padding: 16px;
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      text-align: center;
+      box-shadow: 
+        inset 0 2px 6px rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.2);
+      min-height: 24px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .resultBox.success {
+      background: linear-gradient(145deg, rgba(76,175,80,0.2), rgba(76,175,80,0.1));
+      border: 2px solid var(--success);
+      color: var(--success);
+      box-shadow: 0 0 20px rgba(76,175,80,0.3);
+    }
+
+    .resultBox.error {
+      background: linear-gradient(145deg, rgba(244,67,54,0.2), rgba(244,67,54,0.1));
+      border: 2px solid var(--error);
+      color: var(--error);
+      box-shadow: 0 0 20px rgba(244,67,54,0.3);
+    }
+
+    .resultBox.warning {
+      background: linear-gradient(145deg, rgba(255,152,0,0.2), rgba(255,152,0,0.1));
+      border: 2px solid var(--warning);
+      color: var(--warning);
+      box-shadow: 0 0 20px rgba(255,152,0,0.3);
+    }
+
+    /* סטטיסטיקות מתקדמות */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .stat-box {
+      background: linear-gradient(145deg, var(--primary-light), var(--surface));
+      color: #e8e8e8;
+      padding: 14px 10px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 
+        inset 0 2px 4px rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .stat-box:hover {
+      transform: translateY(-3px);
+      box-shadow: 
+        inset 0 2px 4px rgba(0,0,0,0.3),
+        0 8px 16px rgba(0,0,0,0.3);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--accent-gold);
+      font-family: 'Orbitron', monospace;
+    }
+
+    /* קבלה מתקדמת */
+    .receipt-paper {
+      background: var(--receipt-bg);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px var(--receipt-shadow);
+      margin-top: 20px;
+      border: 1px solid var(--receipt-border);
+      overflow: hidden;
+      max-height: 280px;
+      transition: all 0.3s ease;
+    }
+
+    .receipt-paper:hover {
+      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+    }
+
+    .receipt-header {
+      background: linear-gradient(145deg, var(--accent-gold), var(--accent-orange));
+      color: #333;
+      padding: 16px;
+      font-weight: 900;
+      text-align: center;
+      font-family: 'Orbitron', monospace;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .receipt-content {
+      padding: 16px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .receipt-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .receipt-content::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    .receipt-content::-webkit-scrollbar-thumb {
+      background: var(--accent-gold);
+      border-radius: 3px;
+    }
+
+    .receipt-paper table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .receipt-paper th,
+    .receipt-paper td {
+      text-align: right;
+      padding: 8px 10px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .receipt-paper th {
+      background: #f8f9fa;
+      font-weight: 700;
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .receipt-paper tr:hover {
+      background: #f5f5f5;
+    }
+
+    /* אנימציות מתקדמות */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
+    @keyframes flash {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @keyframes celebrate {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .shake { animation: shake 0.5s ease-in-out; }
+    .flash { animation: flash 0.8s ease-in-out; }
+    .celebrate { animation: celebrate 0.6s ease-in-out; }
+
+    /* רספונסיביות מתקדמת */
+    @media (max-width: 480px) {
+      .register-body {
+        width: 100%;
+        max-width: 380px;
+        margin: 0 10px;
+        transform: none;
+      }
+      
+      .keypad {
+        gap: 12px;
+      }
+      
+      .keypad button {
+        font-size: 24px;
+      }
+      
+      .screen {
+        font-size: 28px;
+      }
+      
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .action-buttons {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+    }
+
+    /* ערכת צבעים כהה */
+    .dark-theme {
+      --primary-dark: #0d1117;
+      --primary-medium: #161b22;
+      --primary-light: #21262d;
+      --surface: #30363d;
+      --accent-gold: #f7931e;
+      --screen-bg: #0d1117;
+      --screen-text: #58a6ff;
+      --screen-glow: #58a6ff;
+    }
+
+    .dark-theme body {
+      background: 
+        radial-gradient(ellipse at top, #0d1117 0%, #161b22 50%, #21262d 100%),
+        linear-gradient(135deg, #1c2128 0%, #22272e 100%);
+    }
+  </style>
+</head>
+<body>
+  <!-- כפתור החלפת ערכת צבעים -->
+  <button class="theme-toggle" onclick="toggleTheme()" title="החלף ערכת צבעים">🎨</button>
+
+  <div class="register-container">
+    <div class="register-body">
+      <div class="brand-logo">🏪 הקופה הקטנה פרימיום</div>
+      
+      <div class="screen-container">
+        <div class="screen" id="lcd">₪0</div>
+        <div class="status-indicator"></div>
+      </div>
+      
+      <div class="product-display" id="productDisplay">
+        <div class="product-emoji" id="productEmoji">🎯</div>
+        <div class="product-info">
+          <div class="product-name" id="productName">בחר מוצר</div>
+          <div class="product-category" id="productCategory">מוכן לתחילת המשחק</div>
+        </div>
+      </div>
+
+      <div class="receipt-slot"></div>
+
+      <div class="keypad">
+        <button data-num="1">1</button>
+        <button data-num="2">2</button>
+        <button data-num="3">3</button>
+        <button data-num="4">4</button>
+        <button data-num="5">5</button>
+        <button data-num="6">6</button>
+        <button data-num="7">7</button>
+        <button data-num="8">8</button>
+        <button data-num="9">9</button>
+        <button data-num="0" class="wide">0</button>
+      </div>
+
+      <div class="action-buttons">
+        <button class="action-btn check-btn" id="checkBtn">✓ בדוק</button>
+        <button class="action-btn clear-btn" id="clearBtn">✗ נקה</button>
+        <button class="action-btn hint-btn" id="hintBtn">💡 רמז</button>
+      </div>
+
+      <div class="resultBox" id="resultBox">מוכן להתחיל את המשחק</div>
+
+      <div class="stats">
+        <div class="stat-box" title="סך הנקודות">
+          <div class="stat-label">נקודות</div>
+          <div class="stat-value" id="stat-score">0</div>
+        </div>
+        <div class="stat-box" title="סך הניסיונות">
+          <div class="stat-label">ניסיונות</div>
+          <div class="stat-value" id="stat-tries">0</div>
+        </div>
+        <div class="stat-box" title="אחוז הצלחה">
+          <div class="stat-label">דיוק</div>
+          <div class="stat-value" id="stat-accuracy">-%</div>
+        </div>
+        <div class="stat-box" title="רצף נוכחי">
+          <div class="stat-label">רצף</div>
+          <div class="stat-value" id="stat-streak">0</div>
+        </div>
+      </div>
+
+      <div class="receipt-paper" id="receiptPaper">
+        <div class="receipt-header">📋 קבלת הקופה</div>
+        <div class="receipt-content">
+          <table>
+            <thead>
+              <tr><th>פריט</th><th>ניחוש</th><th>מחיר</th><th>דיוק</th></tr>
+            </thead>
+            <tbody id="receiptBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // נתוני מוצרים מורחבים
+    const PRODUCTS = [
+      // מזון בסיסי (₪3-10)
+      { אייקון: '🥤', שם: 'שוקו קטן', מחיר: 6, קטגוריה: 'משקאות', רמז: 'משקה שוקולד פופולרי' },
+      { אייקון: '🥯', שם: 'לחמנייה', מחיר: 3, קטגוריה: 'לחם', רמז: 'לחם קטן ועגול' },
+      { אייקון: '🍎', שם: 'תפוח', מחיר: 4, קטגוריה: 'פירות', רמז: 'פרי אדום וטעים' },
+      { אייקון: '🍌', שם: 'בננה', מחיר: 5, קטגוריה: 'פירות', רמז: 'פרי צהוב ועשיר באשלגן' },
+      { אייקון: '🥛', שם: 'חלב ליטר', מחיר: 7, קטגוריה: 'חלב', רמז: 'משקה לבן מזין' },
+      { אייקון: '🍫', שם: 'שוקולד קטן', מחיר: 8, קטגוריה: 'ממתקים', רמז: 'חטיף מתוק' },
+      
+      // צעצועים ומשחקים (₪20-60)
+      { אייקון: '⚽', שם: 'כדור', מחיר: 35, קטגוריה: 'ספורט', רמז: 'לבעיטות וכיף' },
+      { אייקון: '🧩', שם: 'פאזל 100 חלקים', מחיר: 25, קטגוריה: 'צעצועים', רמז: 'משחק חכמה' },
+      { אייקון: '🎲', שם: 'קובייה', מחיר: 15, קטגוריה: 'משחקים', רמז: 'למשחקי קופסה' },
+      { אייקון: '🪀', שם: 'יו-יו', מחיר: 22, קטגוריה: 'צעצועים', רמז: 'צעצוע קלאסי' },
+      { אייקון: '🎨', שם: 'צבעי מים', מחיר: 18, קטגוריה: 'יצירה', רמז: 'לציור ויצירה' },
+      
+      // ספרים וחינוך (₪12-50)
+      { אייקון: '📘', שם: 'ספר ילדים', מחיר: 45, קטגוריה: 'ספרים', רמז: 'לקריאה ולמידה' },
+      { אייקון: '📓', שם: 'מחברת', מחיר: 12, קטגוריה: 'ציוד בית ספר', רמז: 'לכתיבה' },
+      { אייקון: '🖍️', שם: 'עפרונות צבע', מחיר: 28, קטגוריה: 'ציוד בית ספר', רמז: 'לציור צבעוני' },
+      { אייקון: '📏', שם: 'סרגל', מחיר: 8, קטגוריה: 'ציוד בית ספר', רמז: 'למדידה' },
+      
+      // אלקטרוניקה (₪50-200)
+      { אייקון: '🎧', שם: 'אוזניות', מחיר: 120, קטגוריה: 'אלקטרוניקה', רמז: 'להאזנה למוזיקה' },
+      { אייקון: '🔋', שם: 'סוללות AA', מחיר: 15, קטגוריה: 'אלקטרוניקה', רמז: 'מקור כוח נייד' },
+      { אייקון: '💾', שם: 'דיסק און קי', מחיר: 25, קטגוריה: 'אלקטרוניקה', רמז: 'לאחסון קבצים' },
+      { אייקון: '🖱️', שם: 'עכבר מחשב', מחיר: 45, קטגוריה: 'אלקטרוניקה', רמז: 'לניהול המחשב' },
+      
+      // יקרים מיוחדים (₪200+)
+      { אייקון: '🧱', שם: 'לגו גדול', מחיר: 240, קטגוריה: 'צעצועים', רמז: 'קוביות בנייה מתקדמות' },
+      { אייקון: '🚲', שם: 'אופניים לילדים', מחיר: 450, קטגוריה: 'ספורט', רמז: 'לרכיבה וכיף' },
+      { אייקון: '🛴', שם: 'קורקינט', מחיר: 180, קטגוריה: 'ספורט', רמז: 'לגלישה ברחוב' },
+      { אייקון: '🎮', שם: 'קונסולת משחק', מחיר: 380, קטגוריה: 'אלקטרוניקה', רמז: 'למשחקי וידאו' }
+    ];
+
+    // משתני המשחק
+    let inputVal = '', score = 0, tries = 0, current = null;
+    let totalAccuracy = 0, streak = 0, maxStreak = 0;
+    let hintsUsed = 0, perfectGuesses = 0;
+    
+    // אלמנטים
+    const lcd = document.getElementById('lcd');
+    const resultBox = document.getElementById('resultBox');
+    const receiptBody = document.getElementById('receiptBody');
+    const productEmoji = document.getElementById('productEmoji');
+    const productName = document.getElementById('productName');
+    const productCategory = document.getElementById('productCategory');
+    const checkBtn = document.getElementById('checkBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const hintBtn = document.getElementById('hintBtn');
+
+    // פונקציות עזר
+    function pick() {
+      return PRODUCTS[Math.floor(Math.random() * PRODUCTS.length)];
+    }
+
+    function updateDisplay() {
+      lcd.textContent = '₪' + inputVal;
+    }
+
+    function playSound(type) {
+      try {
+        // יצירת צלילים עם Web Audio API
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        switch(type) {
+          case 'beep':
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            break;
+          case 'success':
+            oscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
+            break;
+          case 'error':
+            oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+            break;
+        }
+        
+        gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.2);
+      } catch (error) {
+        console.log('שגיאה בהפעלת צליל:', error);
+      }
+    }
+
+    function next() {
+      current = pick();
+      inputVal = '';
+      updateDisplay();
+      
+      productEmoji.textContent = current.אייקון;
+      productName.textContent = current.שם;
+      productCategory.textContent = current.קטגוריה;
+      
+      resultBox.textContent = `מוצר חדש: ${current.שם}`;
+      resultBox.className = 'resultBox';
+      lcd.className = 'screen';
+      
+      // איפוס כפתור הרמז
+      hintBtn.textContent = '💡 רמז';
+      hintBtn.disabled = false;
+      
+      // אנימציה
+      document.getElementById('productDisplay').classList.add('celebrate');
+      setTimeout(() => {
+        document.getElementById('productDisplay').classList.remove('celebrate');
+      }, 600);
+    }
+
+    function calculateAccuracy(diff) {
+      return Math.max(0, 100 - (diff * 100));
+    }
+
+    function getScoreMultiplier(accuracy) {
+      if (accuracy >= 99) return 20; // מושלם מאוד
+      if (accuracy >= 95) return 15; // מושלם
+      if (accuracy >= 85) return 12; // מעולה
+      if (accuracy >= 70) return 10; // טוב מאוד
+      if (accuracy >= 50) return 7;  // טוב
+      if (accuracy >= 30) return 4;  // בסדר
+      return 1; // צריך שיפור
+    }
+
+    function getResultMessage(accuracy) {
+      if (accuracy >= 99) return '🎯 מושלם מאוד!';
+      if (accuracy >= 95) return '⭐ מושלם!';
+      if (accuracy >= 85) return '🏆 מעולה!';
+      if (accuracy >= 70) return '👍 טוב מאוד!';
+      if (accuracy >= 50) return '😊 לא רע!';
+      if (accuracy >= 30) return '📈 אפשר יותר טוב';
+      return '🎯 נסה שוב!';
+    }
+
+    function updateStats() {
+      document.getElementById('stat-score').textContent = score;
+      document.getElementById('stat-tries').textContent = tries;
+      document.getElementById('stat-accuracy').textContent = 
+        tries > 0 ? Math.round(totalAccuracy / tries) + '%' : '-%';
+      document.getElementById('stat-streak').textContent = streak;
+    }
+
+    function check() {
+      if (!current || !inputVal) {
+        resultBox.textContent = '⚠️ הכנס מחיר תחילה';
+        resultBox.className = 'resultBox error';
+        lcd.classList.add('shake');
+        playSound('error');
+        setTimeout(() => lcd.classList.remove('shake'), 500);
+        return;
+      }
+
+      const guess = Number(inputVal);
+      const actual = current.מחיר;
+      const diff = Math.abs(guess - actual) / actual;
+      const accuracy = calculateAccuracy(diff);
+      let points = getScoreMultiplier(accuracy);
+      
+      // בונוס לרצף
+      if (accuracy >= 70) {
+        streak++;
+        if (streak > maxStreak) maxStreak = streak;
+        points += Math.floor(streak / 3); // בונוס לכל 3 ברצף
+      } else {
+        streak = 0;
+      }
+      
+      // בונוס למושלמים
+      if (accuracy >= 99) {
+        perfectGuesses++;
+        points += 5;
+      }
+      
+      score += points;
+      tries++;
+      totalAccuracy += accuracy;
+      
+      const message = getResultMessage(accuracy);
+      resultBox.textContent = `${message} מחיר: ₪${actual}, ניחוש: ₪${guess} (+${points})`;
+      
+      // צבעי משוב ואנימציות
+      if (accuracy >= 85) {
+        resultBox.className = 'resultBox success';
+        lcd.className = 'screen';
+        lcd.style.color = 'var(--success)';
+        playSound('success');
+        document.querySelector('.register-body').classList.add('celebrate');
+      } else if (accuracy >= 50) {
+        resultBox.className = 'resultBox warning';
+        lcd.className = 'screen';
+        lcd.style.color = 'var(--warning)';
+        playSound('beep');
+      } else {
+        resultBox.className = 'resultBox error';
+        lcd.className = 'screen';
+        lcd.style.color = 'var(--error)';
+        playSound('error');
+        lcd.classList.add('flash');
+      }
+
+      updateStats();
+
+      // הוספה לקבלה
+      const row = document.createElement('tr');
+      const accuracyColor = accuracy >= 85 ? 'var(--success)' : 
+                           accuracy >= 50 ? 'var(--warning)' : 'var(--error)';
+      row.innerHTML = `
+        <td>${current.אייקון} ${current.שם}</td>
+        <td>₪${guess}</td>
+        <td>₪${actual}</td>
+        <td style="color: ${accuracyColor}; font-weight: bold;">${accuracy.toFixed(1)}%</td>
+      `;
+      receiptBody.prepend(row);
+
+      // מעבר למוצר הבא
+      setTimeout(() => {
+        lcd.style.color = 'var(--screen-text)';
+        document.querySelector('.register-body').classList.remove('celebrate');
+        lcd.classList.remove('flash');
+        next();
+      }, 3000);
+    }
+
+    function clearInput() {
+      inputVal = '';
+      updateDisplay();
+      resultBox.textContent = 'נוקה - הכנס מחיר חדש';
+      resultBox.className = 'resultBox';
+      lcd.style.color = 'var(--screen-text)';
+      playSound('beep');
+    }
+
+    function showHint() {
+      if (!current) return;
+      
+      hintBtn.textContent = `💡 ${current.רמז}`;
+      hintBtn.disabled = true;
+      hintsUsed++;
+      
+      // קנס על השימוש ברמז
+      if (score > 2) score -= 2;
+      updateStats();
+      
+      playSound('beep');
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark-theme');
+      playSound('beep');
+      
+      // שמירה ב-localStorage
+      const isDark = document.body.classList.contains('dark-theme');
+      localStorage.setItem('darkTheme', isDark);
+    }
+
+    // מאזיני אירועים
+    document.querySelectorAll('.keypad button').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        console.log('כפתור נלחץ:', btn.dataset.num);
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (btn.dataset.num !== undefined) {
+          inputVal += btn.dataset.num;
+          updateDisplay();
+          playSound('beep');
+        }
+      });
+    });
+
+    checkBtn.addEventListener('click', (e) => {
+      console.log('כפתור בדיקה נלחץ');
+      e.preventDefault();
+      check();
+    });
+    
+    clearBtn.addEventListener('click', (e) => {
+      console.log('כפתור ניקוי נלחץ');
+      e.preventDefault();
+      clearInput();
+    });
+    
+    hintBtn.addEventListener('click', (e) => {
+      console.log('כפתור רמז נלחץ');
+      e.preventDefault();
+      showHint();
+    });
+    
+    lcd.addEventListener('click', (e) => {
+      console.log('מסך נלחץ');
+      e.preventDefault();
+      check();
+    });
+
+    // קיצורי מקלדת
+    document.addEventListener('keydown', (e) => {
+      if (e.key >= '0' && e.key <= '9') {
+        inputVal += e.key;
+        updateDisplay();
+        playSound('beep');
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        check();
+      } else if (e.key === 'Escape' || e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        clearInput();
+      } else if (e.key === 'h' || e.key === 'H') {
+        e.preventDefault();
+        showHint();
+      }
+    });
+
+    // אתחול
+    function init() {
+      console.log('🚀 מתחיל לאתחל את הקופה...');
+      
+      // בדיקת אלמנטים
+      console.log('בדיקת אלמנטים:', {
+        lcd: !!lcd,
+        checkBtn: !!checkBtn,
+        clearBtn: !!clearBtn,
+        hintBtn: !!hintBtn,
+        keypadButtons: document.querySelectorAll('.keypad button').length
+      });
+      
+      // טעינת ערכת צבעים שמורה
+      if (localStorage.getItem('darkTheme') === 'true') {
+        document.body.classList.add('dark-theme');
+      }
+      
+      // התחלת המשחק
+      next();
+      
+      console.log('🏪 הקופה הקטנה פרימיום מוכנה!');
+    }
+
+    // התחלה כשהעמוד נטען
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

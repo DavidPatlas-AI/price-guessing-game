@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>קופה רושמת לילדים — עובד ובולט</title>
+<style>
+  :root{--ink:#0f172a;--muted:#6b7280;--accent:#ffd166;--ok:#16a34a;--warn:#eab308;--bad:#ef4444}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Heebo,Arial,sans-serif;background:#fff7ef;color:var(--ink)}
+  header{background:#222;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+  .title{font-weight:900;font-size:20px}
+  .tabs{display:flex;gap:8px}
+  .tab-btn{border:none;border-radius:10px;background:#444;color:#fff;padding:8px 12px;font-weight:800;cursor:pointer}
+  .tab-btn.active{background:var(--accent);color:#222}
+  main{max-width:1100px;margin:16px auto;padding:10px}
+  .card{background:#fff;border:2px solid #eee;border-radius:14px;box-shadow:0 6px 0 #f2efe8;padding:14px;margin-bottom:16px}
+  .row{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
+  @media(max-width:900px){.row{grid-template-columns:1fr}}
+  .face{display:flex;gap:14px;align-items:center}
+  .emoji{width:96px;height:96px;border-radius:14px;display:grid;place-items:center;font-size:58px;background:#fff;border:3px solid #eee}
+  .name{font-size:26px;font-weight:900}
+  .sub{color:var(--muted);font-size:13px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  select{padding:10px 12px;border:2px solid #e5e7eb;border-radius:10px;background:#fff;font-weight:700}
+  .lcd{margin-top:10px;background:#111;color:#0ef3ac;font-family:'Courier New',monospace;border-radius:10px;padding:10px;text-align:center;font-size:22px;box-shadow:inset 0 0 12px #053}
+  .keypad{display:grid;grid-template-columns:repeat(3,110px);gap:10px;justify-content:center;margin-top:12px}
+  .keypad button{height:80px;border-radius:14px;border:none;background:var(--accent);font-weight:900;font-size:28px;cursor:pointer;box-shadow:0 5px 0 #e9b949}
+  .keypad button:active{transform:translateY(3px);box-shadow:0 2px 0 #e9b949}
+  .wide{grid-column:span 2}
+  .full{grid-column:span 3}
+  table{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+  th,td{border-bottom:1px dashed #e5e7eb;padding:8px 6px;text-align:right}
+  th{background:#fafafa}
+  .muted{color:var(--muted)}
+</style>
+</head>
+<body>
+  <header>
+    <div class="title">₪ קופה רושמת לילדים — רואים ועובד</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="game">🧾 קופה</button>
+      <button class="tab-btn" data-tab="budget">🧺 סל</button>
+      <button class="tab-btn" data-tab="about">ℹ️ עזרה</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- GAME -->
+    <section id="game" class="card">
+      <div class="row">
+        <div>
+          <div class="face">
+            <div class="emoji" id="p-emoji">🧃</div>
+            <div>
+              <div class="name" id="p-name">שם מוצר</div>
+              <div class="sub" id="p-meta">קטגוריה • קושי</div>
+            </div>
+          </div>
+          <div class="controls">
+            <label>קטגוריה <select id="categorySelect"></select></label>
+            <label>קושי
+              <select id="difficultySelect">
+                <option value="all">הכל</option>
+                <option value="1">קל</option>
+                <option value="2">בינוני</option>
+                <option value="3">קשה</option>
+              </select>
+            </label>
+            <button id="nextBtn">🎲 פריט חדש</button>
+          </div>
+          <div class="lcd" id="lcd">₪0</div>
+          <div class="keypad">
+            <button data-key="1">1</button>
+            <button data-key="2">2</button>
+            <button data-key="3">3</button>
+            <button data-key="4">4</button>
+            <button data-key="5">5</button>
+            <button data-key="6">6</button>
+            <button data-key="7">7</button>
+            <button data-key="8">8</button>
+            <button data-key="9">9</button>
+            <button class="wide" data-key="00">00</button>
+            <button data-key="0">0</button>
+            <button data-act="back">←</button>
+            <button class="wide" data-act="clear">ניקוי</button>
+            <button class="full" id="enterBtn">ENTER ✅</button>
+          </div>
+          <div class="lcd muted" id="resultBox">מוכן</div>
+        </div>
+        <div>
+          <b>🧾 קבלה</b>
+          <table id="receiptTable"><thead><tr><th>פריט</th><th>ניחוש</th><th>מחיר</th><th>סטייה</th></tr></thead><tbody></tbody><tfoot><tr><td><b>סה"כ נקודות</b></td><td colspan="3" id="recScore">0</td></tr></tfoot></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUDGET (פשוט, כדי לוודא שמוצג) -->
+    <section id="budget" class="card" style="display:none">
+      <div class="controls">
+        <label>תקציב ₪ <input type="number" id="budgetInput" value="300"></label>
+      </div>
+      <div class="controls">
+        <label>קטגוריה <select id="basketCategory"></select></label>
+        <label>פריט <select id="basketItem"></select></label>
+        <button id="addToBasket">➕ הוסף</button>
+      </div>
+      <table id="basketTable"><thead><tr><th>פריט</th><th>קטגוריה</th><th>מחיר</th><th>הסר</th></tr></thead><tbody></tbody></table>
+      <div class="lcd" id="budgetResult">סה"כ ₪0</div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="card" style="display:none">
+      אם אינך רואה כלום — ודא שאין תוספי דפדפן שחוסמים סקריפטים. הקוד כאן סטטי בלבד.
+    </section>
+  </main>
+
+<script>
+'use strict';
+// ===== DATA (מפתחות באנגלית, טקסט בעברית) =====
+const PRODUCTS=[
+  {category:'Food', name:'לחם פרוס', icon:'🍞', price:9, min:7, max:14, difficulty:1},
+  {category:'Food', name:'שוקולד 100ג׳', icon:'🍫', price:8, min:5, max:12, difficulty:1},
+  {category:'Food', name:'חלב 3% 1ל׳', icon:'🥛', price:7, min:5, max:8, difficulty:1},
+  {category:'Food', name:'פסטה 500ג׳', icon:'🍝', price:6, min:4, max:10, difficulty:1},
+  {category:'Food', name:'קורנפלקס 750ג׳', icon:'🥣', price:18, min:12, max:28, difficulty:2},
+  {category:'Produce', name:'עגבניות 1ק', icon:'🍅', price:8, min:5, max:12, difficulty:2},
+  {category:'Produce', name:'בננות 1ק', icon:'🍌', price:9, min:6, max:12, difficulty:2},
+  {category:'Hygiene', name:'שמפו 700מ״ל', icon:'🧴', price:16, min:12, max:28, difficulty:2},
+  {category:'Cleaning', name:'אבקת כביסה 3ק', icon:'🧼', price:38, min:28, max:65, difficulty:2},
+  {category:'Toys', name:'סט לגו בינוני', icon:'🧱', price:240, min:150, max:450, difficulty:3},
+  {category:'School', name:'מחברת A4', icon:'📒', price:6, min:3, max:10, difficulty:1},
+  {category:'Tech', name:'עכבר מחשב', icon:'🖱️', price:45, min:25, max:120, difficulty:1},
+  {category:'Tech', name:'מקלדת בסיסית', icon:'⌨️', price:79, min:49, max:160, difficulty:2},
+  {category:'Clothes', name:'טי-שירט ילדים', icon:'👕', price:39, min:25, max:80, difficulty:1}
+];
+
+// ===== TABS =====
+const tabs=document.querySelectorAll('.tab-btn');
+const sections={game:document.getElementById('game'),budget:document.getElementById('budget'),about:document.getElementById('about')};
+tabs.forEach(btn=>btn.addEventListener('click',()=>{tabs.forEach(b=>b.classList.remove('active'));btn.classList.add('active');const t=btn.dataset.tab;Object.keys(sections).forEach(k=>sections[k].style.display=(k===t?'block':'none'));}));
+
+// ===== DOM =====
+const catSel=document.getElementById('categorySelect');
+const diffSel=document.getElementById('difficultySelect');
+const elEmoji=document.getElementById('p-emoji');
+const elName=document.getElementById('p-name');
+const elMeta=document.getElementById('p-meta');
+const elResult=document.getElementById('resultBox');
+const lcd=document.getElementById('lcd');
+const enterBtn=document.getElementById('enterBtn');
+const recBody=document.querySelector('#receiptTable tbody');
+
+// ===== Build categories =====
+const CATS=[...new Set(PRODUCTS.map(p=>p.category))].sort();
+catSel.innerHTML='<option value="all">כל הקטגוריות</option>' + CATS.map(c=>`<option value="${c}">${c}</option>`).join('');
+
+// ===== State =====
+let current=null, score=0, tries=0; let inputVal='';
+const fmt=n=>Number(n).toLocaleString('he-IL',{maximumFractionDigits:0});
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function filtered(){ let a=PRODUCTS.slice(); if(catSel.value!=='all') a=a.filter(p=>p.category===catSel.value); if(diffSel.value!=='all') a=a.filter(p=>String(p.difficulty)===diffSel.value); return a; }
+function nextProduct(){ const pool=filtered(); if(!pool.length){ current=null; elEmoji.textContent='🛒'; elName.textContent='אין פריטים'; elMeta.textContent='בחר/י קטגוריה אחרת'; return; } current=pick(pool); elEmoji.textContent=current.icon; elName.textContent=current.name; elMeta.textContent=`${current.category} • קושי ${current.difficulty}`; elResult.textContent='מוכן'; inputVal=''; lcd.textContent='₪0'; }
+
+function basePoints(d){ if(d<=0.05) return 10; if(d<=0.15) return 8; if(d<=0.30) return 6; if(d<=0.50) return 4; return 1; }
+function checkGuess(){ if(!current) return; const guess=Number(inputVal||0); if(!Number.isFinite(guess)||inputVal===''){ elResult.textContent='הקלד/י סכום בלוח'; return; } const diff=Math.abs(guess-current.price)/Math.max(1,current.price); const pts=basePoints(diff)+(current.difficulty||0); score+=pts; tries++; elResult.innerHTML=`מחיר: <b>₪${fmt(current.price)}</b> • ניחוש: <b>₪${fmt(guess)}</b> • סטייה ${(diff*100).toFixed(1)}% • +${pts}`; const tr=document.createElement('tr'); tr.innerHTML=`<td>${current.icon} ${current.name}</td><td>₪${fmt(guess)}</td><td>₪${fmt(current.price)}</td><td>${(diff*100).toFixed(1)}%</td>`; recBody.prepend(tr); document.getElementById('recScore').textContent=fmt(score); nextProduct(); }
+
+// ===== Keypad =====
+function sync(){ lcd.textContent='₪'+(inputVal||'0'); }
+function push(d){ if(inputVal.length>7) return; inputVal=(inputVal+d).replace(/^0+(\d)/,'$1'); sync(); }
+function back(){ inputVal=inputVal.slice(0,-1); sync(); }
+function clearAll(){ inputVal=''; sync(); }
+
+document.querySelectorAll('.keypad [data-key]').forEach(b=>b.addEventListener('click',()=>push(b.dataset.key)));
+document.querySelector('[data-act="back"]').addEventListener('click',back);
+document.querySelector('[data-act="clear"]').addEventListener('click',clearAll);
+enterBtn.addEventListener('click',checkGuess);
+
+catSel.addEventListener('change',nextProduct);
+diffSel.addEventListener('change',nextProduct);
+document.getElementById('nextBtn').addEventListener('click',nextProduct);
+
+// ===== Budget (simple, works) =====
+const basket=[]; const basketCat=document.getElementById('basketCategory'); const basketItem=document.getElementById('basketItem'); const basketBody=document.querySelector('#basketTable tbody'); const budgetInput=document.getElementById('budgetInput'); const budgetResult=document.getElementById('budgetResult');
+basketCat.innerHTML=CATS.map(c=>`<option value="${c}">${c}</option>`).join('');
+function fillItems(){ const items=PRODUCTS.filter(p=>p.category===basketCat.value); basketItem.innerHTML=items.map((p,i)=>`<option value="${i}">${p.icon} ${p.name}</option>`).join(''); }
+basketCat.addEventListener('change',fillItems); fillItems();
+function renderBasket(){ basketBody.innerHTML=basket.map((it,i)=>`<tr><td>${it.icon} ${it.name}</td><td>${it.category}</td><td>₪${fmt(it.price)}</td><td><button data-i="${i}">🗑️</button></td></tr>`).join(''); basketBody.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{ basket.splice(Number(btn.dataset.i),1); renderBasket(); calcBudget(); }); calcBudget(); }
+function calcBudget(){ const budget=Number(budgetInput.value||0); const sum=basket.reduce((s,it)=>s+it.price,0); const diff=sum-budget; budgetResult.textContent= diff<=0?`בתקציב: ₪${fmt(sum)} (נשאר ₪${fmt(-diff)})`:`חריגה: ₪${fmt(diff)} (סה"כ ₪${fmt(sum)})`; }
+
+document.getElementById('addToBasket').addEventListener('click',()=>{ const list=PRODUCTS.filter(p=>p.category===basketCat.value); const it=list[Number(basketItem.value)]; if(it){ basket.push(it); renderBasket(); }});
+
+// ===== First render =====
+nextProduct();
+console.log('✅ הקופה נטענה בהצלחה');
+</script>
+</body>
+</html>

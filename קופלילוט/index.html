@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>הקופה הקטנה פלוס — השדרוג המלא</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="logo">₪ הקופה הקטנה פלוס</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="game">קופה</button>
+      <button class="tab-btn" data-tab="receipt">קבלה</button>
+    </div>
+    <div class="dark-toggle" id="darkToggle">🌓 מצב לילה</div>
+  </header>
+  
+  <main>
+    <section id="game" class="card">
+      <div class="level-select">
+        רמת קושי:
+        <select id="levelSelect">
+          <option value="קל">קל</option>
+          <option value="בינוני">בינוני</option>
+          <option value="קשה">קשה</option>
+        </select>
+      </div>
+      
+      <div class="face">
+        <div class="emoji" id="p-emoji">🍎</div>
+        <div>
+          <div class="name" id="p-name">שם מוצר</div>
+          <div class="sub" id="p-meta">קטגוריה • רמה</div>
+        </div>
+      </div>
+      
+      <div class="lcd" id="lcd">₪0</div>
+      
+      <div class="keypad">
+        <button data-num="1">1</button>
+        <button data-num="2">2</button>
+        <button data-num="3">3</button>
+        <button data-num="4">4</button>
+        <button data-num="5">5</button>
+        <button data-num="6">6</button>
+        <button data-num="7">7</button>
+        <button data-num="8">8</button>
+        <button data-num="9">9</button>
+        <button data-num="0" style="grid-column:span 3">0</button>
+      </div>
+      
+      <div class="register" id="resultBox">מוכן</div>
+      
+      <div class="stats">
+        <div class="stat-box"><div>נקודות</div><div id="stat-score">0</div></div>
+        <div class="stat-box"><div>ניסיונות</div><div id="stat-tries">0</div></div>
+      </div>
+      
+      <button class="share-btn" onclick="shareScore()">שתף תוצאה</button>
+      <div class="achievements" id="achievements"></div>
+    </section>
+    
+    <section id="receipt" class="card" style="display:none;">
+      <h3>🧾 קבלה</h3>
+      <table id="receiptTable">
+        <thead><tr><th>פריט</th><th>ניחוש</th><th>מחיר</th><th>סטייה</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- צלילים -->
+  <audio id="beep" src="sounds/beep.ogg" preload="auto"></audio>
+  <audio id="clap" src="sounds/clap.ogg" preload="auto"></audio>
+  <audio id="buzz" src="sounds/buzz.ogg" preload="auto"></audio>
+
+  <script src="data.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

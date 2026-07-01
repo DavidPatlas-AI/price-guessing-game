@@ -1,0 +1,1322 @@
+        // התחלת משחק יחיד
+        function startGameMode(mode) {
+            gameMode = mode;
+            currentQuestionIndex = 1;
+            currentScore = 0;
+            usedProductIndexes = [];
+            currentStreak = 0;
+            bestStreak = 0;
+            correctAnswers = 0;
+            scoreMultiplier = 1;
+            
+            document.getElementById('category-screen').classList.add('hidden');
+            document.getElementById('single-game').classList.remove('hidden');
+            document.getElementById('final-screen').classList.add('hidden');
+            
+            showNextQuestion();
+        }
+
+        // עדכון לוח תוצאות
+        function updatePlayersScoreboard() {
+            var scoresDiv = document.getElementById('players-scores');
+            scoresDiv.innerHTML = '';
+            
+            var sortedPlayers = players.slice().sort(function(a, b) { return b.score - a.score; });
+            
+            for (var i = 0; i < sortedPlayers.length; i++) {
+                var player = sortedPlayers[i];
+                var row = document.createElement('div');
+                row.className = 'player-score-row';
+                
+                if (player === players[currentPlayerIndex] && player.isAlive) {
+                    row.classList.add('current-player');
+                }
+                
+                if (!player.isAlive) {
+                    row.style.opacity = '0.5';
+                }
+                
+                var playerInfo = '<div class="player-info">';
+                playerInfo += '<span class="player-color" style="background: ' + player.color + ';"></span>';
+                playerInfo += '<span class="player-name">' + player.name + '</span>';
+                
+                if (gameType === 'survival' && player.isAlive) {
+                    playerInfo += '<span class="survival-lives">❤️ ' + player.lives + '</span>';
+                }
+                
+                if (player.streak >= 2) {
+                    playerInfo += '<span class="streak-display">🔥 ' + player.streak + '</span>';
+                }
+                
+                playerInfo += '</div>';
+                playerInfo += '<span class="player-score">' + player.score + ' נק\'</span>';
+                
+                row.innerHTML = playerInfo;
+                scoresDiv.appendChild(row);
+            }
+        }
+
+        // הצגת שאלה במולטי פלייר
+        function showNextMultiQuestion() {
+            // מציאת השחקן הבא החי
+            var attempts = 0;
+            while (!players[currentPlayerIndex].isAlive && attempts < players.length) {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+                attempts++;
+            }
+            
+            if (attempts >= players.length) {
+                endMultiplayerGame();
+                return;
+            }
+            
+            // בדיקה אם כל השחקנים סיימו את השאלות שלהם
+            if (gameType === 'multi' && multiQuestionCount >= maxQuestionsPerPlayer * players.length) {
+                endMultiplayerGame();
+                return;
+            }
+            
+            var availableProducts = getAvailableProducts();
+            var unusedProducts = availableProducts.filter(function(product, index) {
+                return usedProductIndexes.indexOf(index) === -1;
+            });
+
+            if (unusedProducts.length === 0) {
+                usedProductIndexes = [];
+                unusedProducts = availableProducts;
+            }
+
+            var randomIndex = Math.floor(Math.random() * unusedProducts.length);
+            currentProduct = unusedProducts[randomIndex];
+            var originalIndex = availableProducts.indexOf(currentProduct);
+            usedProductIndexes.push(originalIndex);
+
+            // עדכון הממשק
+            document.getElementById('multi-product-emoji').textContent = currentProduct.emoji;
+            document.getElementById('multi-product-name').textContent = currentProduct.name;
+            document.getElementById('multi-product-hint').textContent = '💡 רמז: ' + currentProduct.hint;
+            document.getElementById('current-player-indicator').textContent = '🎯 תור של: ' + players[currentPlayerIndex].name;
+            document.getElementById('multi-price-input').value = '';
+            document.getElementById('multi-result-screen').classList.add('hidden');
+            document.getElementById('multi-price-input').focus();
+
+            updatePlayersScoreboard();
+            startMultiTimer();
+        }
+
+        // טיימר למולטי פלייר
+        function startMultiTimer() {
+            timeRemaining = 30;
+            document.getElementById('multi-time-left').textContent = timeRemaining;
+            document.getElementById('multi-timer').className = 'timer-container';
+            
+            gameTimer = setInterval(function() {
+                timeRemaining--;
+                document.getElementById('multi-time-left').textContent = timeRemaining;
+                
+                if (timeRemaining <= 10) {
+                    document.getElementById('multi-timer').className = 'timer-container timer-warning';
+                }
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(gameTimer);
+                    handleMultiTimeUp();
+                }
+            }, 1000);
+        }
+
+        // זמן נגמר במולטי פלייר
+        function handleMultiTimeUp() {
+            var currentPlayer = players[currentPlayerIndex];
+            currentPlayer.streak = 0;
+            
+            if (gameType === 'survival') {
+                currentPlayer.lives--;
+                if (currentPlayer.lives <= 0) {
+                    currentPlayer.isAlive = false;
+                }
+            }
+            
+            var resultElement = document.getElementById('multi-result-display');
+            resultElement.textContent = '⏰ הזמן נגמר! המחיר האמיתי: ' + currentProduct.price + '₪';
+            resultElement.className = 'result result-poor';
+            
+            document.getElementById('multi-result-screen').classList.remove('hidden');
+            updatePlayersScoreboard();
+        }
+
+                wasCorrect = true;
+            } else if (errorPercentage <= 20) {
+                points = 8;
+                resultClass = 'result-good';
+                resultMessage = '👍 טוב! המחיר האמיתי: ' + actualPrice + '₪';
+                wasCorrect = true;
+            } else if (errorPercentage <= 40) {
+                points = 4;
+                resultClass = 'result-okay';
+                resultMessage = '🤔 קרוב... המחיר האמיתי: ' + actualPrice + '₪';
+            } else {
+                points = 1;
+                resultClass = 'result-poor';
+                resultMessage = '😅 לא קרוב... המחיר האמיתי: ' + actualPrice + '₪';
+            }
+
+            // בונוס זמן
+            var timeBonus = Math.max(0, Math.floor(timeRemaining / 3));
+            points += timeBonus;
+
+            // עדכון רצף
+            if (wasCorrect) {
+                currentPlayer.streak++;
+                
+                // כפיל לפי רצף
+                var multiplier = 1;
+                if (currentPlayer.streak >= 5) {
+                    multiplier = 3;
+                } else if (currentPlayer.streak >= 3) {
+                    multiplier = 2;
+                }
+                points = Math.floor(points * multiplier);
+                
+            } else {
+                currentPlayer.streak = 0;
+                
+                // במצב הישרדות - הפסדת חיים
+                if (gameType === 'survival') {
+                    currentPlayer.lives--;
+                    if (currentPlayer.lives <= 0) {
+                        currentPlayer.isAlive = false;
+                        resultMessage += '<br>💀 ' + currentPlayer.name + ' נפסל מהמשחק!';
+                    }
+                }
+            }
+
+            currentPlayer.score += points;
+
+            // הצגת תוצאה
+            var bonusText = '';
+            if (timeBonus > 0) bonusText += ' | ⏰ בונוס: +' + timeBonus;
+            if (multiplier > 1) bonusText += ' | 🔥 כפיל x' + multiplier;
+            
+            var resultElement = document.getElementById('multi-result-display');
+            resultElement.innerHTML = resultMessage + bonusText + '<br><strong>' + currentPlayer.name + ' קיבל: ' + points + ' נקודות!</strong>';
+            resultElement.className = 'result ' + resultClass;
+            
+            // הצגת פאוור-אפ
+            showPowerUp(currentPlayer, wasCorrect);
+            
+            document.getElementById('multi-result-screen').classList.remove('hidden');
+            updatePlayersScoreboard();
+            
+            multiQuestionCount++;
+        }
+
+        // הצגת פאוור-אפים
+        function showPowerUp(player, wasCorrect) {
+            var powerupDiv = document.getElementById('powerup-display');
+            powerupDiv.innerHTML = '';
+            
+            if (player.streak === 3) {
+                powerupDiv.innerHTML = '<div class="powerup-notification">🔥 ' + player.name + ' במצב אש! כפיל x2!</div>';
+            } else if (player.streak === 5) {
+                powerupDiv.innerHTML = '<div class="powerup-notification">⚡ ' + player.name + ' במצב סופר! כפיל x3!</div>';
+            } else if (wasCorrect && Math.random() < 0.1) {
+                // פאוור-אפ אקראי
+                var powerups = [
+                    '🍀 מזל טוב! בונוס 50 נקודות!',
+                    '⭐ כוכב זהוב! הנקודות הבאות יוכפלו!',
+                    '🎯 דיוק מושלם! +100 נקודות!'
+                ];
+                var randomPowerup = powerups[Math.floor(Math.random() * powerups.length)];
+                powerupDiv.innerHTML = '<div class="powerup-notification">' + randomPowerup + '</div>';
+                
+                if (randomPowerup.includes('50 נקודות')) {
+                    player.score += 50;
+                } else if (randomPowerup.includes('100 נקודות')) {
+                    player.score += 100;
+                }
+            }
+        }
+
+        // מעבר לשחקן הבא
+        function nextMultiQuestion() {
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            showNextMultiQuestion();
+        }
+
+        // סיום משחק רב-משתתפים
+        function endMultiplayerGame() {
+            if (gameTimer) {
+                clearInterval(gameTimer);
+            }
+            
+            document.getElementById('multiplayer-game').classList.add('hidden');
+            document.getElementById('final-screen').classList.remove('hidden');
+            
+            // מציאת המנצח
+            var alivePlayers = players.filter(function(p) { return p.isAlive; });
+            var winner;
+            
+            if (gameType === 'survival') {
+                winner = alivePlayers.length === 1 ? alivePlayers[0] : 
+                        alivePlayers.reduce(function(a, b) { return a.score > b.score ? a : b; });
+            } else {
+                winner = players.reduce(function(a, b) { return a.score > b.score ? a : b; });
+            }
+            
+            showMultiplayerResults(winner);
+        }
+
+        // הצגת תוצאות רב-משתתפים
+        function showMultiplayerResults(winner) {
+            var statsDiv = document.getElementById('final-screen').querySelector('.stats-container');
+            statsDiv.innerHTML = '<div class="winner-announcement">🏆 המנצח: ' + winner.name + '!<br>ניקוד: ' + winner.score + ' נקודות</div>';
+            
+            // לוח תוצאות סופי
+            var finalScores = '<h3 style="text-align: center;">📊 לוח התוצאות הסופי</h3>';
+            var sortedPlayers = players.slice().sort(function(a, b) { return b.score - a.score; });
+            
+            for (var i = 0; i < sortedPlayers.length; i++) {
+                var player = sortedPlayers[i];
+                var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '🏅';
+                var status = player.isAlive ? '' : ' (נפסל)';
+                
+                finalScores += '<div class="stats-row">';
+                finalScores += '<span>' + medal + ' ' + player.name + status + '</span>';
+                finalScores += '<span style="font-weight: bold; color: ' + player.color + ';">' + player.score + ' נק\'</span>';
+                finalScores += '</div>';
+            }
+            
+            statsDiv.innerHTML += '<div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0;">' + finalScores + '</div>';
+            
+            // הסתר רכיבים לא רלוונטיים
+            document.getElementById('exact-count').parentElement.style.display = 'none';
+            document.getElementById('max-streak-display').parentElement.style.display = 'none';
+            document.getElementById('rating-display').style.display = 'none';
+            document.getElementById('child-summary').style.display = 'none';
+        }
+
+        // התחלה מחדש מלאה
+        function restartFromBeginning() {
+            // איפוס כל המשתנים
+            players = [];
+            currentPlayerIndex = 0;
+            multiQuestionCount = 0;
+            currentQuestionIndex = 1;
+            currentScore = 0;
+            usedProductIndexes = [];
+            currentStreak = 0;
+            bestStreak = 0;
+            correctAnswers = 0;
+            scoreMultiplier = 1;
+            
+            if (gameTimer) {
+                clearInterval(gameTimer);
+            }
+            
+            // הצגת מסך ראשי
+            goBackToModeSelection();
+            
+            // איפוס רכיבי הממשק
+            document.getElementById('exact-count').parentElement.style.display = 'flex';
+            document.getElementById('max-streak-display').parentElement.style.display = 'flex';
+            
+            // איפוס רשימת שחקנים להתחלה
+            var playersList = document.getElementById('players-list');
+            while (playersList.children.length > 2) {
+                playersList.removeChild(playersList.lastChild);
+            }
+            document.getElementById('add-player-btn').style.display = 'inline-block';
+            document.getElementById('remove-player-btn').style.display = 'none';
+            
+            // ניקוי שדות שמות
+            var inputs = document.querySelectorAll('.player-name-input');
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].value = '';
+            }
+        }
+
+        // תמיכה מורחבת במקש Enter
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                if (!document.getElementById('single-game').classList.contains('hidden')) {
+                    if (document.getElementById('result-screen').classList.contains('hidden')) {
+                        submitAnswer();
+                    } else {
+                        goToNextQuestion();
+                    }
+                } else if (!document.getElementById('multiplayer-game').classList.contains('hidden')) {
+                    if (document.getElementById('multi-result-screen').classList.contains('hidden')) {
+                        submitMultiAnswer();
+                    } else {
+                        nextMultiQuestion();
+                    }
+                }
+            }
+        });<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק ניחוש מחירים מאתגר</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            direction: rtl;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        
+        .score {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .timer-container {
+            background: #ff6b6b;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .timer-warning {
+            background: #ff4757 !important;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .product-card {
+            background: #f8f9fa;
+            border: 3px solid #e9ecef;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .product-emoji {
+            font-size: 4em;
+            margin: 10px 0;
+        }
+        
+        .product-name {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        
+        .product-hint {
+            font-size: 0.9em;
+            color: #888;
+            margin: 10px 0;
+            font-style: italic;
+            background: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+        
+        .input-section {
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .price-input {
+            font-size: 1.5em;
+            padding: 15px;
+            border: 3px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            width: 200px;
+            margin: 0 10px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .category-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 10px;
+            min-width: 200px;
+            transition: all 0.3s;
+        }
+        
+        .category-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .result {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        
+        .result-excellent {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        
+        .result-good {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+        
+        .result-okay {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeaa7;
+        }
+        
+        .result-poor {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f1b0b7;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .stats-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        .streak-display {
+            display: inline-block;
+            background: #27ae60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+        
+        /* עיצוב שחקנים מרובים */
+        .player-input-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        
+        .player-name-input {
+            font-size: 1.1em;
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            width: 200px;
+            margin-left: 10px;
+        }
+        
+        .player-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .players-scoreboard {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .player-score-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .current-player {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .player-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .player-name {
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.1em;
+        }
+        
+        .player-score {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .survival-lives {
+            background: #e74c3c;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+        
+        .winner-announcement {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.3em;
+            margin: 20px 0;
+            animation: winner-glow 2s infinite;
+        }
+        
+        @keyframes winner-glow {
+            0% { box-shadow: 0 0 20px rgba(240, 147, 251, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(245, 87, 108, 0.8); }
+            100% { box-shadow: 0 0 20px rgba(240, 147, 251, 0.5); }
+        }
+        
+        .powerup-notification {
+            background: #f39c12;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 10px 0;
+            animation: powerup-pulse 1s;
+        }
+        
+        @keyframes powerup-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">🎯 משחק ניחוש מחירים מתקדם</h1>
+        
+        <!-- בחירת מצב משחק -->
+        <div id="mode-selection">
+            <div style="text-align: center; margin: 30px 0;">
+                <h2>בחר את מצב המשחק:</h2>
+                <p style="color: #666;">30 שניות לשאלה • רצפים • כפילים • מוצרים מפתיעים!</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="category-btn" onclick="selectGameMode('single')">
+                    👤 שחקן יחיד<br>
+                    <small>אתגר אישי מול השעון</small>
+                </button>
+                
+                <button class="category-btn" onclick="selectGameMode('multi')">
+                    👥 שחקנים מרובים<br>
+                    <small>תחרות מול חברים</small>
+                </button>
+                
+                <button class="category-btn" onclick="selectGameMode('survival')">
+                    ⚡ מצב הישרדות<br>
+                    <small>עד הטעות הראשונה!</small>
+                </button>
+            </div>
+        </div>
+
+        <!-- הגדרת שחקנים -->
+        <div id="player-setup" class="hidden">
+            <div style="text-align: center; margin: 30px 0;">
+                <h2>הוספת שחקנים:</h2>
+                <p style="color: #666;">הזינו שמות השחקנים (2-6 שחקנים)</p>
+            </div>
+            
+            <div style="text-align: center;" id="players-list">
+                <div class="player-input-row">
+                    <input type="text" placeholder="שם שחקן 1" class="player-name-input" maxlength="15">
+                    <span class="player-color" style="background: #e74c3c;"></span>
+                </div>
+                <div class="player-input-row">
+                    <input type="text" placeholder="שם שחקן 2" class="player-name-input" maxlength="15">
+                    <span class="player-color" style="background: #3498db;"></span>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="btn" onclick="addPlayer()" id="add-player-btn">➕ הוסף שחקן</button>
+                <button class="btn" onclick="removePlayer()" id="remove-player-btn" style="background: #e74c3c;">➖ הסר שחקן</button>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="category-btn" onclick="startMultiplayerGame()" style="font-size: 1.3em;">🚀 התחל משחק!</button>
+                <br>
+                <button class="btn" onclick="goBackToModeSelection()" style="background: #95a5a6;">⬅️ חזור</button>
+            </div>
+        </div>
+        <!-- בחירת קטגוריה -->
+        <div id="category-screen" class="hidden">
+            <div style="text-align: center; margin: 30px 0;">
+                <h2>בחר את סוג המשחק:</h2>
+                <p style="color: #666;" id="category-description">בחר את הקטגוריה שמעניינת אותך!</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="category-btn" onclick="startGameMode('all')">
+                    🛍️ כל המוצרים<br>
+                    <small>מאייפון ועד ביג מק</small>
+                </button>
+                
+                <button class="category-btn" onclick="startGameMode('child')">
+                    👶 הוצאות על ילד<br>
+                    <small>כמה באמת עולה לגדל אותי?</small>
+                </button>
+                
+                <button class="category-btn" onclick="startGameMode('basic')">
+                    🏪 מוצרים בסיסיים<br>
+                    <small>אוכל ודברים מוכרים</small>
+                </button>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="goBackToModeSelection()" style="background: #95a5a6;">⬅️ חזור למצבי משחק</button>
+            </div>
+        </div>
+        
+        <!-- משחק רב-משתתפים -->
+        <div id="multiplayer-game" class="hidden">
+            <div class="players-scoreboard">
+                <h3 style="text-align: center; margin-bottom: 15px;">🏆 לוח תוצאות</h3>
+                <div id="players-scores"></div>
+            </div>
+            
+            <div id="multi-timer" class="timer-container">
+                ⏰ זמן נותר: <span id="multi-time-left">30</span> שניות
+            </div>
+            
+            <div class="product-card">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <span id="current-player-indicator" style="font-size: 1.2em; font-weight: bold;">🎯 תור של: </span>
+                </div>
+                <div class="product-emoji" id="multi-product-emoji">🖱️</div>
+                <div class="product-name" id="multi-product-name">טוען מוצר...</div>
+                <div class="product-hint" id="multi-product-hint"></div>
+            </div>
+            
+            <div class="input-section">
+                <input type="number" class="price-input" id="multi-price-input" placeholder="0" min="0">
+                <span style="font-size: 1.5em; font-weight: bold;">₪</span>
+                <br><br>
+                <button class="btn" onclick="submitMultiAnswer()">בדוק תשובה!</button>
+            </div>
+            
+            <div id="multi-result-screen" class="hidden">
+                <div class="result" id="multi-result-display"></div>
+                <div id="powerup-display"></div>
+                <button class="btn" onclick="nextMultiQuestion()">שחקן הבא!</button>
+            </div>
+        </div>
+        <!-- משחק יחיד -->
+        <div id="single-game" class="hidden">
+            <div class="score">
+                <span id="score-display">ניקוד: 0</span> | 
+                <span id="question-display">שאלה: 1/15</span>
+                <div id="streak-info"></div>
+            </div>
+            
+            <div id="timer-display" class="timer-container">
+                ⏰ זמן נותר: <span id="time-left">30</span> שניות
+            </div>
+            
+            <div class="product-card">
+                <div class="product-emoji" id="product-emoji">🖱️</div>
+                <div class="product-name" id="product-name">טוען מוצר...</div>
+                <div class="product-hint" id="product-hint"></div>
+            </div>
+            
+            <div class="input-section">
+                <input type="number" class="price-input" id="price-input" placeholder="0" min="0">
+                <span style="font-size: 1.5em; font-weight: bold;">₪</span>
+                <br><br>
+                <button class="btn" onclick="submitAnswer()">בדוק תשובה!</button>
+            </div>
+            
+            <div id="result-screen" class="hidden">
+                <div class="result" id="result-display"></div>
+                <button class="btn" onclick="goToNextQuestion()">שאלה הבאה!</button>
+            </div>
+        </div>
+        
+        <!-- מסך סיום -->
+        <div id="final-screen" class="hidden">
+            <div class="stats-container">
+                <h2 style="text-align: center; color: #2c3e50;">🏆 תוצאות המשחק</h2>
+                <div class="stats-row">
+                    <span>ניקוד סופי:</span>
+                    <span id="final-score" style="font-weight: bold; color: #4ecdc4;">0</span>
+                </div>
+                <div class="stats-row">
+                    <span>תשובות מדויקות:</span>
+                    <span id="exact-count" style="font-weight: bold; color: #27ae60;">0</span>
+                </div>
+                <div class="stats-row">
+                    <span>רצף מקסימלי:</span>
+                    <span id="max-streak-display" style="font-weight: bold; color: #e74c3c;">0</span>
+                </div>
+            </div>
+            
+            <div id="rating-display" class="summary hidden"></div>
+            <div id="child-summary" class="summary hidden"></div>
+            
+            <button class="btn" onclick="restartFromBeginning()" style="width: 100%;">🔄 משחק חדש</button>
+        </div>
+    </div>
+
+    <script>
+        // נתוני המוצרים
+        var allProducts = [
+            // מוצרים בסיסיים
+            {name: "עכבר מחשב בסיסי", emoji: "🖱️", price: 35, hint: "עכבר חוטי פשוט", category: "basic"},
+            {name: "עכבר גיימרים", emoji: "🖱️", price: 180, hint: "עכבר מתקדם", category: "basic"},
+            {name: "מקלדת רגילה", emoji: "⌨️", price: 65, hint: "מקלדת ממברנה", category: "basic"},
+            {name: "מקלדת מכנית", emoji: "⌨️", price: 350, hint: "מקלדת רועשת", category: "basic"},
+            {name: "מחשב נייד בסיסי", emoji: "💻", price: 2200, hint: "למשימות פשוטות", category: "basic"},
+            {name: "אייפון 15", emoji: "📱", price: 4200, hint: "האייפון החדש", category: "basic"},
+            {name: "סמסונג גלקסי", emoji: "📱", price: 1800, hint: "אנדרואיד איכותי", category: "basic"},
+            {name: "קילו בננות", emoji: "🍌", price: 8, hint: "פירות טריים", category: "basic"},
+            {name: "קילו בשר טחון", emoji: "🥩", price: 54, hint: "בשר בקר", category: "basic"},
+            {name: "ביג מק", emoji: "🍔", price: 38, hint: "המבורגר מפורסם", category: "basic"},
+            {name: "פיצה משפחתית", emoji: "🍕", price: 78, hint: "פיצה גדולה", category: "basic"},
+            {name: "זוג נעלי נייק", emoji: "👟", price: 450, hint: "נעלי ספורט", category: "basic"},
+            {name: "פלייסטיישן 5", emoji: "🎮", price: 2200, hint: "הקונסולה החדשה", category: "basic"},
+            {name: "ליטר בנזין", emoji: "⛽", price: 7, hint: "דלק לרכב", category: "basic"},
+            {name: "כרטיס רכבת לירושלים", emoji: "🚄", price: 24, hint: "נסיעה חד כיוונית", category: "basic"},
+            
+            // הוצאות על ילד
+            {name: "חודש אוכל לילד", emoji: "🍽️", price: 950, hint: "כל הארוחות והחטיפים", category: "child"},
+            {name: "חוג כדורגל חודשי", emoji: "⚽", price: 320, hint: "פעמיים בשבוע", category: "child"},
+            {name: "שיעורי פסנתר פרטיים", emoji: "🎹", price: 480, hint: "שיעור שבועי", category: "child"},
+            {name: "שיעורי עזר מתמטיקה", emoji: "🔢", price: 280, hint: "עזרה במתמטיקה", category: "child"},
+            {name: "כסף כיס שבועי", emoji: "💰", price: 50, hint: "לחטיפים ופעילויות", category: "child"},
+            {name: "מסיבת יום הולדת", emoji: "🎂", price: 1200, hint: "אולם + אוכל + הפעלה", category: "child"},
+            {name: "קייטנת קיץ חודשית", emoji: "🏖️", price: 1800, hint: "קייטנה איכותית", category: "child"},
+            {name: "ביגוד לחורף", emoji: "🧥", price: 600, hint: "מעיל ונעליים", category: "child"},
+            {name: "חופשה בחו״ל לילד", emoji: "✈️", price: 5200, hint: "שבוע עם המשפחה", category: "child"},
+            {name: "אייפד לבית ספר", emoji: "📱", price: 2800, hint: "טאבלט ללימודים", category: "child"},
+            {name: "רופא שיניים", emoji: "🦷", price: 450, hint: "יישור שיניים", category: "child"},
+            {name: "נעלי ספורט איכותיות", emoji: "👟", price: 380, hint: "נעליים לשנה שלמה", category: "child"}
+        ];
+
+        // משתני המשחק המתקדמים
+        var gameType = 'single'; // single, multi, survival
+        var gameMode = 'all';
+        var players = [];
+        var currentPlayerIndex = 0;
+        var multiQuestionCount = 0;
+        var maxQuestionsPerPlayer = 5;
+        var playerColors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
+        
+        // משתני משחק יחיד
+        var currentQuestionIndex = 1;
+        var totalQuestions = 15;
+        var currentScore = 0;
+        var currentProduct = null;
+        var usedProductIndexes = [];
+        var timeRemaining = 30;
+        var gameTimer = null;
+        var currentStreak = 0;
+        var bestStreak = 0;
+        var correctAnswers = 0;
+        var scoreMultiplier = 1;
+
+        // בחירת מצב משחק
+        function selectGameMode(mode) {
+            gameType = mode;
+            
+            if (mode === 'single' || mode === 'survival') {
+                document.getElementById('mode-selection').classList.add('hidden');
+                document.getElementById('category-screen').classList.remove('hidden');
+                
+                if (mode === 'survival') {
+                    document.getElementById('category-description').textContent = 'מצב הישרדות: טעות אחת ואתה בחוץ!';
+                } else {
+                    document.getElementById('category-description').textContent = 'בחר את הקטגוריה שמעניינת אותך!';
+                }
+            } else if (mode === 'multi') {
+                document.getElementById('mode-selection').classList.add('hidden');
+                document.getElementById('player-setup').classList.remove('hidden');
+            }
+        }
+
+        // חזרה לבחירת מצב
+        function goBackToModeSelection() {
+            document.getElementById('mode-selection').classList.remove('hidden');
+            document.getElementById('category-screen').classList.add('hidden');
+            document.getElementById('player-setup').classList.add('hidden');
+            document.getElementById('single-game').classList.add('hidden');
+            document.getElementById('multiplayer-game').classList.add('hidden');
+            document.getElementById('final-screen').classList.add('hidden');
+        }
+
+        // הוספת שחקן
+        function addPlayer() {
+            var playersList = document.getElementById('players-list');
+            var currentPlayers = playersList.children.length;
+            
+            if (currentPlayers >= 6) {
+                alert('ניתן להוסיף עד 6 שחקנים בלבד');
+                return;
+            }
+            
+            var newRow = document.createElement('div');
+            newRow.className = 'player-input-row';
+            newRow.innerHTML = 
+                '<input type="text" placeholder="שם שחקן ' + (currentPlayers + 1) + '" class="player-name-input" maxlength="15">' +
+                '<span class="player-color" style="background: ' + playerColors[currentPlayers] + ';"></span>';
+            
+            playersList.appendChild(newRow);
+            
+            if (currentPlayers >= 5) {
+                document.getElementById('add-player-btn').style.display = 'none';
+            }
+            if (currentPlayers >= 1) {
+                document.getElementById('remove-player-btn').style.display = 'inline-block';
+            }
+        }
+
+        // הסרת שחקן
+        function removePlayer() {
+            var playersList = document.getElementById('players-list');
+            var currentPlayers = playersList.children.length;
+            
+            if (currentPlayers <= 2) {
+                alert('חייבים לפחות 2 שחקנים');
+                return;
+            }
+            
+            playersList.removeChild(playersList.lastChild);
+            
+            if (currentPlayers <= 3) {
+                document.getElementById('remove-player-btn').style.display = 'none';
+            }
+            document.getElementById('add-player-btn').style.display = 'inline-block';
+        }
+
+        // התחלת משחק רב-משתתפים
+        function startMultiplayerGame() {
+            var playerInputs = document.querySelectorAll('.player-name-input');
+            players = [];
+            
+            for (var i = 0; i < playerInputs.length; i++) {
+                var name = playerInputs[i].value.trim() || 'שחקן ' + (i + 1);
+                players.push({
+                    name: name,
+                    score: 0,
+                    streak: 0,
+                    lives: gameType === 'survival' ? 3 : null,
+                    color: playerColors[i],
+                    isAlive: true
+                });
+            }
+            
+            currentPlayerIndex = 0;
+            multiQuestionCount = 0;
+            usedProductIndexes = [];
+            gameMode = 'all'; // ברירת מחדל למולטי פלייר
+            
+            document.getElementById('player-setup').classList.add('hidden');
+            document.getElementById('multiplayer-game').classList.remove('hidden');
+            
+            updatePlayersScoreboard();
+            showNextMultiQuestion();
+        }
+            gameMode = mode;
+            currentQuestionIndex = 1;
+            currentScore = 0;
+            usedProductIndexes = [];
+            currentStreak = 0;
+            bestStreak = 0;
+            correctAnswers = 0;
+            scoreMultiplier = 1;
+            
+            document.getElementById('category-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('final-screen').classList.add('hidden');
+            
+            showNextQuestion();
+        }
+
+        // בחירת מוצרים לפי מצב
+        function getAvailableProducts() {
+            if (gameMode === 'child') {
+                return allProducts.filter(function(p) { return p.category === 'child'; });
+            } else if (gameMode === 'basic') {
+                return allProducts.filter(function(p) { return p.category === 'basic' && p.price <= 500; });
+            } else {
+                return allProducts;
+            }
+        }
+
+        // הצגת שאלה חדשה
+        function showNextQuestion() {
+            if (currentQuestionIndex > totalQuestions) {
+                endGame();
+                return;
+            }
+
+            var availableProducts = getAvailableProducts();
+            var unusedProducts = availableProducts.filter(function(product, index) {
+                return usedProductIndexes.indexOf(index) === -1;
+            });
+
+            if (unusedProducts.length === 0) {
+                usedProductIndexes = [];
+                unusedProducts = availableProducts;
+            }
+
+            var randomIndex = Math.floor(Math.random() * unusedProducts.length);
+            currentProduct = unusedProducts[randomIndex];
+            var originalIndex = availableProducts.indexOf(currentProduct);
+            usedProductIndexes.push(originalIndex);
+
+            // עדכון הממשק
+            document.getElementById('product-emoji').textContent = currentProduct.emoji;
+            document.getElementById('product-name').textContent = currentProduct.name;
+            document.getElementById('product-hint').textContent = '💡 רמז: ' + currentProduct.hint;
+            document.getElementById('question-display').textContent = 'שאלה: ' + currentQuestionIndex + '/' + totalQuestions;
+            document.getElementById('price-input').value = '';
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('price-input').focus();
+
+            updateStreakDisplay();
+            startQuestionTimer();
+        }
+
+        // התחלת הטיימר
+        function startQuestionTimer() {
+            timeRemaining = 30;
+            document.getElementById('time-left').textContent = timeRemaining;
+            document.getElementById('timer-display').className = 'timer-container';
+            
+            gameTimer = setInterval(function() {
+                timeRemaining--;
+                document.getElementById('time-left').textContent = timeRemaining;
+                
+                if (timeRemaining <= 10) {
+                    document.getElementById('timer-display').className = 'timer-container timer-warning';
+                }
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(gameTimer);
+                    handleTimeUp();
+                }
+            }, 1000);
+        }
+
+        // זמן נגמר
+        function handleTimeUp() {
+            currentStreak = 0;
+            scoreMultiplier = 1;
+            
+            var resultElement = document.getElementById('result-display');
+            resultElement.textContent = '⏰ הזמן נגמר! המחיר האמיתי: ' + currentProduct.price + '₪';
+            resultElement.className = 'result result-poor';
+            
+            document.getElementById('result-screen').classList.remove('hidden');
+            updateStreakDisplay();
+            currentQuestionIndex++;
+        }
+
+        // בדיקת תשובה
+        function submitAnswer() {
+            if (gameTimer) {
+                clearInterval(gameTimer);
+            }
+
+            var userInput = document.getElementById('price-input').value;
+            var userGuess = parseInt(userInput);
+            
+            if (isNaN(userGuess) || userGuess <= 0) {
+                alert('אנא הזן מחיר תקין');
+                startQuestionTimer();
+                return;
+            }
+
+            var actualPrice = currentProduct.price;
+            var difference = Math.abs(userGuess - actualPrice);
+            var errorPercentage = (difference / actualPrice) * 100;
+
+            var points = 0;
+            var resultClass = '';
+            var resultMessage = '';
+            var wasCorrect = false;
+
+            // חישוב נקודות
+            if (errorPercentage <= 3) {
+                points = 15;
+                resultClass = 'result-excellent';
+                resultMessage = '🎯 מושלם! המחיר האמיתי: ' + actualPrice + '₪';
+                correctAnswers++;
+                wasCorrect = true;
+            } else if (errorPercentage <= 8) {
+                points = 12;
+                resultClass = 'result-excellent';
+                resultMessage = '🌟 מצוין! המחיר האמיתי: ' + actualPrice + '₪';
+                correctAnswers++;
+                wasCorrect = true;
+            } else if (errorPercentage <= 20) {
+                points = 8;
+                resultClass = 'result-good';
+                resultMessage = '👍 טוב! המחיר האמיתי: ' + actualPrice + '₪';
+                wasCorrect = true;
+            } else if (errorPercentage <= 40) {
+                points = 4;
+                resultClass = 'result-okay';
+                resultMessage = '🤔 קרוב... המחיר האמיתי: ' + actualPrice + '₪';
+            } else {
+                points = 1;
+                resultClass = 'result-poor';
+                resultMessage = '😅 לא קרוב... המחיר האמיתי: ' + actualPrice + '₪';
+            }
+
+            // בונוס זמן
+            var timeBonus = Math.max(0, Math.floor(timeRemaining / 3));
+            points += timeBonus;
+
+            // עדכון רצף
+            if (wasCorrect) {
+                currentStreak++;
+                if (currentStreak > bestStreak) {
+                    bestStreak = currentStreak;
+                }
+                
+                if (currentStreak >= 5) {
+                    scoreMultiplier = 3;
+                } else if (currentStreak >= 3) {
+                    scoreMultiplier = 2;
+                } else {
+                    scoreMultiplier = 1;
+                }
+            } else {
+                currentStreak = 0;
+                scoreMultiplier = 1;
+            }
+
+            // כפל נקודות
+            points = Math.floor(points * scoreMultiplier);
+
+            currentScore += points;
+
+            // הצגת תוצאה
+            var bonusText = '';
+            if (timeBonus > 0) bonusText += ' | ⏰ בונוס: +' + timeBonus;
+            if (scoreMultiplier > 1) bonusText += ' | 🔥 כפיל x' + scoreMultiplier;
+            
+            var resultElement = document.getElementById('result-display');
+            resultElement.textContent = resultMessage + bonusText + ' | סה"כ: ' + points + ' נקודות!';
+            resultElement.className = 'result ' + resultClass;
+            
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('score-display').textContent = 'ניקוד: ' + currentScore;
+            
+            updateStreakDisplay();
+            currentQuestionIndex++;
+        }
+
+        // עדכון תצוגת הרצף
+        function updateStreakDisplay() {
+            var streakInfo = document.getElementById('streak-info');
+            var content = '';
+            
+            if (currentStreak >= 2) {
+                content += '<div class="streak-display">🔥 רצף: ' + currentStreak + '</div>';
+            }
+            
+            if (scoreMultiplier > 1) {
+                content += '<div class="multiplier-display">כפיל: x' + scoreMultiplier + '</div>';
+            }
+            
+            streakInfo.innerHTML = content;
+        }
+
+        // מעבר לשאלה הבאה
+        function goToNextQuestion() {
+            showNextQuestion();
+        }
+
+        // סיום המשחק
+        function endGame() {
+            if (gameTimer) {
+                clearInterval(gameTimer);
+            }
+            
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('final-screen').classList.remove('hidden');
+            
+            document.getElementById('final-score').textContent = currentScore;
+            document.getElementById('exact-count').textContent = correctAnswers;
+            document.getElementById('max-streak-display').textContent = bestStreak;
+            
+            showPerformanceRating();
+            
+            if (gameMode === 'child') {
+                showChildExpensesSummary();
+            }
+        }
+
+        // הערכת ביצועים
+        function showPerformanceRating() {
+            var ratingElement = document.getElementById('rating-display');
+            ratingElement.classList.remove('hidden');
+            
+            var rating = '';
+            var message = '';
+            
+            if (currentScore >= 1800) {
+                rating = '🏆 מומחה כלכלי!';
+                message = 'אתה מכיר מחירים כמו מומחה! מדהים!';
+            } else if (currentScore >= 1400) {
+                rating = '🥇 מעולה!';
+                message = 'ביצועים מדהימים! יש לך חוש כלכלי מפותח!';
+            } else if (currentScore >= 1000) {
+                rating = '🥈 טוב מאוד!';
+                message = 'ביצועים טובים! אתה מתחיל להבין מחירים!';
+            } else if (currentScore >= 600) {
+                rating = '🥉 לא רע!';
+                message = 'התחלה טובה! עוד קצת תרגול ותשתפר!';
+            } else {
+                rating = '🎯 יש מה לשפר';
+                message = 'אל תתייאש! זה קשה בהתחלה. נסה שוב!';
+            }
+            
+            ratingElement.innerHTML = '<h3>' + rating + '</h3><p>' + message + '</p>';
+        }
+
+        // סיכום הוצאות על ילד
+        function showChildExpensesSummary() {
+            var summaryElement = document.getElementById('child-summary');
+            summaryElement.classList.remove('hidden');
+            
+            var monthlyExpense = 2350;
+            var yearlyExpense = monthlyExpense * 12;
+            var total18Years = yearlyExpense * 18;
+            
+            summaryElement.innerHTML = 
+                '<h3>💰 עובדות מדהימות על הוצאות הורים</h3>' +
+                '<p><strong>💸 חודשי:</strong> כ-' + monthlyExpense.toLocaleString() + '₪</p>' +
+                '<p><strong>📅 שנתי:</strong> כ-' + yearlyExpense.toLocaleString() + '₪</p>' +
+                '<p><strong>🤯 עד גיל 18:</strong> כ-' + total18Years.toLocaleString() + '₪!</p>' +
+                '<p><strong>🎯 מסקנה:</strong> ההורים שלך משקיעים הון אמיתי!</p>' +
+                '<p style="font-size: 0.9em; margin-top: 15px;">' +
+                '💡 <strong>עצה:</strong> כשאתה מבקש משהו יקר, חשוב כמה חודשי אוכל או חוגים זה שווה!' +
+                '</p>';
+        }
+
+        // התחלה מחדש
+        function restartFromBeginning() {
+            document.getElementById('final-screen').classList.add('hidden');
+            document.getElementById('category-screen').classList.remove('hidden');
+            document.getElementById('rating-display').classList.add('hidden');
+            document.getElementById('child-summary').classList.add('hidden');
+        }
+
+        // תמיכה במקש Enter
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                if (!document.getElementById('game-screen').classList.contains('hidden')) {
+                    if (document.getElementById('result-screen').classList.contains('hidden')) {
+                        submitAnswer();
+                    } else {
+                        goToNextQuestion();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

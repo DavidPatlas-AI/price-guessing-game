@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>הקופה הקטנה - תיקון</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .register-body {
+      background: #333;
+      border-radius: 20px;
+      padding: 30px;
+      width: 400px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .screen {
+      background: #001122;
+      color: #00ff88;
+      font-family: 'Courier New', monospace;
+      font-size: 32px;
+      font-weight: bold;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: left;
+      margin-bottom: 20px;
+      border: 2px solid #004400;
+    }
+
+    .product-display {
+      background: #444;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 20px 0;
+      color: white;
+      text-align: center;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .keypad button {
+      height: 60px;
+      font-size: 24px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      background: #666;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .keypad button:hover {
+      background: #777;
+      transform: translateY(-2px);
+    }
+
+    .keypad button:active {
+      transform: translateY(2px);
+      background: #555;
+    }
+
+    .keypad .wide {
+      grid-column: span 3;
+      background: #ff8800;
+    }
+
+    .keypad .wide:hover {
+      background: #ff9900;
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .action-btn {
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .check-btn {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .clear-btn {
+      background: #f44336;
+      color: white;
+    }
+
+    .action-btn:hover {
+      opacity: 0.8;
+    }
+
+    .result-box {
+      background: #444;
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      margin: 20px 0;
+      font-family: 'Courier New', monospace;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .stat-box {
+      background: #444;
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffcc00;
+    }
+
+    /* טקסט דיבוג */
+    .debug {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: black;
+      color: lime;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 12px;
+      border-radius: 5px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="debug" id="debug">מוכן...</div>
+
+  <div class="register-body">
+    <div class="screen" id="lcd">₪0</div>
+    
+    <div class="product-display" id="productDisplay">
+      <div style="font-size: 48px;" id="productEmoji">🍎</div>
+      <div style="font-size: 20px; margin: 10px 0;" id="productName">מוכן</div>
+    </div>
+
+    <div class="keypad" id="keypad">
+      <button onclick="addDigit('1')">1</button>
+      <button onclick="addDigit('2')">2</button>
+      <button onclick="addDigit('3')">3</button>
+      <button onclick="addDigit('4')">4</button>
+      <button onclick="addDigit('5')">5</button>
+      <button onclick="addDigit('6')">6</button>
+      <button onclick="addDigit('7')">7</button>
+      <button onclick="addDigit('8')">8</button>
+      <button onclick="addDigit('9')">9</button>
+      <button onclick="addDigit('0')" class="wide">0</button>
+    </div>
+
+    <div class="action-buttons">
+      <button class="action-btn check-btn" onclick="checkAnswer()">✓ בדוק</button>
+      <button class="action-btn clear-btn" onclick="clearInput()">✗ נקה</button>
+    </div>
+
+    <div class="result-box" id="resultBox">מוכן להתחיל</div>
+
+    <div class="stats">
+      <div class="stat-box">
+        <div>נקודות</div>
+        <div class="stat-value" id="score">0</div>
+      </div>
+      <div class="stat-box">
+        <div>ניסיונות</div>
+        <div class="stat-value" id="tries">0</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // דיבוג
+    function debugLog(message) {
+      console.log(message);
+      document.getElementById('debug').textContent = message;
+    }
+
+    // נתוני משחק
+    const PRODUCTS = [
+      { emoji: '🍎', name: 'תפוח', price: 4 },
+      { emoji: '🍌', name: 'בננה', price: 5 },
+      { emoji: '🥛', name: 'חלב', price: 7 },
+      { emoji: '🍞', name: 'לחם', price: 8 },
+      { emoji: '🥤', name: 'שוקו', price: 6 },
+      { emoji: '🧱', name: 'לגו', price: 120 },
+      { emoji: '📘', name: 'ספר', price: 45 },
+      { emoji: '⚽', name: 'כדור', price: 35 }
+    ];
+
+    let inputValue = '';
+    let currentProduct = null;
+    let score = 0;
+    let tries = 0;
+
+    debugLog('טוען משחק...');
+
+    function addDigit(digit) {
+      debugLog('לחץ על: ' + digit);
+      inputValue += digit;
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      document.getElementById('lcd').textContent = '₪' + inputValue;
+      debugLog('מסך: ₪' + inputValue);
+    }
+
+    function clearInput() {
+      debugLog('מנקה...');
+      inputValue = '';
+      updateDisplay();
+      document.getElementById('resultBox').textContent = 'נוקה - הכנס מחיר';
+    }
+
+    function nextProduct() {
+      currentProduct = PRODUCTS[Math.floor(Math.random() * PRODUCTS.length)];
+      document.getElementById('productEmoji').textContent = currentProduct.emoji;
+      document.getElementById('productName').textContent = currentProduct.name;
+      document.getElementById('resultBox').textContent = `מוצר: ${currentProduct.name}`;
+      debugLog('מוצר חדש: ' + currentProduct.name + ' - ₪' + currentProduct.price);
+    }
+
+    function checkAnswer() {
+      if (!currentProduct || !inputValue) {
+        debugLog('שגיאה: אין מוצר או מחיר');
+        document.getElementById('resultBox').textContent = '⚠️ הכנס מחיר תחילה';
+        return;
+      }
+
+      const guess = parseInt(inputValue);
+      const actual = currentProduct.price;
+      const diff = Math.abs(guess - actual) / actual;
+      
+      let points = 1;
+      if (diff === 0) points = 10;
+      else if (diff <= 0.1) points = 7;
+      else if (diff <= 0.3) points = 4;
+      
+      score += points;
+      tries++;
+      
+      document.getElementById('score').textContent = score;
+      document.getElementById('tries').textContent = tries;
+      
+      const message = `מחיר: ₪${actual}, ניחוש: ₪${guess} (+${points})`;
+      document.getElementById('resultBox').textContent = message;
+      
+      debugLog(`תוצאה: ${message}`);
+      
+      // מוצר חדש אחרי 2 שניות
+      setTimeout(() => {
+        inputValue = '';
+        updateDisplay();
+        nextProduct();
+      }, 2000);
+    }
+
+    // התחלה
+    debugLog('מתחיל משחק...');
+    nextProduct();
+    debugLog('משחק מוכן!');
+
+    // קיצורי מקלדת
+    document.addEventListener('keydown', function(e) {
+      if (e.key >= '0' && e.key <= '9') {
+        addDigit(e.key);
+      } else if (e.key === 'Enter') {
+        checkAnswer();
+      } else if (e.key === 'Escape') {
+        clearInput();
+      }
+    });
+
+    debugLog('הכל מוכן! לחץ על מספרים');
+  </script>
+
+</body>
+</html>
