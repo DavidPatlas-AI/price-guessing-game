@@ -1,3 +1,4 @@
-# Hebrew price guessing game for the whole family | הכל בכסף
-
-MIT © 2026 [David Patlas](https://github.com/DavidPatlas-AI)
+# הכל בכסף — Price Guessing Game
+משחק ניחוש מחירים בעברית למשפחה.
+**הרצה:** פתח `index.html` (יש `index_upgraded.html` כגרסה משודרגת).
+*(שים לב: תיקיות בשמות "קלוד"/"קופיילוט"/"קרוסר"/"מוזנח" נראות כמו תיקיות עבודה זמניות — כדאי לסדר)*
